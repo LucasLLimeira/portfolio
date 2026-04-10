@@ -56,7 +56,13 @@ export type Project = {
   forks?: number;
   updatedAt?: string;
   languagePercent?: number;
+  languagesBreakdown?: LanguageStat[];
   isPinned?: boolean;
+};
+
+export type LanguageStat = {
+  language: string;
+  percent: number;
 };
 
 export type ServiceItem = {

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { Mail } from "lucide-react";
+import { ChevronLeft, ChevronRight, Mail } from "lucide-react";
 
 import { Badge } from "@/components/badge";
 import { Button } from "@/components/button";
@@ -13,8 +13,8 @@ import { ProjectModal } from "@/components/project-modal";
 import { SectionTitle } from "@/components/section-title";
 import { useLocale } from "@/contexts/locale-context";
 import { getContent } from "@/lib/content";
-import { fetchFeaturedGithubProjects } from "@/lib/github";
-import type { Project } from "@/types/content";
+import { getLanguageColor } from "@/lib/language-colors";
+import type { LanguageStat, Project } from "@/types/content";
 import type { EducationItem, ServiceItem } from "@/types/content";
 
 const githubUsername = "LucasLLimeira";
@@ -40,6 +40,64 @@ function LinkedinMark() {
   );
 }
 
+type ProjectsCarouselProps = {
+  title: string;
+  projects: Project[];
+  locale: "pt" | "en";
+  onOpen: (project: Project) => void;
+};
+
+function ProjectsCarousel({ title, projects, locale, onOpen }: ProjectsCarouselProps) {
+  const trackRef = useRef<HTMLDivElement | null>(null);
+
+  const slide = (direction: "prev" | "next") => {
+    const node = trackRef.current;
+    if (!node) return;
+
+    const distance = Math.max(260, Math.floor(node.clientWidth * 0.85));
+    node.scrollBy({
+      left: direction === "next" ? distance : -distance,
+      behavior: "smooth",
+    });
+  };
+
+  return (
+    <div className="space-y-3" data-reveal>
+      <p className="text-xs font-semibold uppercase tracking-[0.15em] text-brand-700 dark:text-brand-200">
+        {title}
+      </p>
+
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => slide("prev")}
+          className="absolute left-0 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
+          aria-label={locale === "pt" ? "Ver cards anteriores" : "View previous cards"}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+
+        <div ref={trackRef} className="carousel-track">
+          {projects.map((project) => (
+            <div key={project.slug} className="carousel-item">
+              <ProjectCard project={project} onOpen={onOpen} locale={locale} />
+            </div>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => slide("next")}
+          className="absolute right-0 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
+          aria-label={locale === "pt" ? "Ver proximos cards" : "View next cards"}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function PortfolioPage() {
   const { locale } = useLocale();
   const content = useMemo(() => getContent(locale), [locale]);
@@ -49,26 +107,37 @@ export function PortfolioPage() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [remoteLoading, setRemoteLoading] = useState(true);
   const [usingFallback, setUsingFallback] = useState(false);
+  const [languageStats, setLanguageStats] = useState<LanguageStat[]>([]);
 
   useEffect(() => {
     let mounted = true;
 
     const syncGithub = async () => {
       setRemoteLoading(true);
-      const remoteProjects = await fetchFeaturedGithubProjects(
-        content.featuredRepoNames,
-        content.projects,
-        locale,
-      );
+      const response = await fetch(`/api/github-data?locale=${locale}`, {
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        setProjects(content.projects);
+        setUsingFallback(true);
+        setLanguageStats([]);
+        setRemoteLoading(false);
+        setActiveTag("all");
+        return;
+      }
+
+      const payload = (await response.json()) as {
+        projects: Project[];
+        languageStats: LanguageStat[];
+        fallbackUsed: boolean;
+      };
 
       if (!mounted) return;
 
-      const fallbackUsed =
-        remoteProjects.length === content.projects.length &&
-        remoteProjects.every((project, index) => project.slug === content.projects[index]?.slug);
-
-      setProjects(remoteProjects);
-      setUsingFallback(fallbackUsed);
+      setProjects(payload.projects);
+      setUsingFallback(payload.fallbackUsed);
+      setLanguageStats(payload.languageStats);
       setRemoteLoading(false);
       setActiveTag("all");
     };
@@ -85,7 +154,8 @@ export function PortfolioPage() {
     projects.forEach((project) => {
       project.tags.forEach((tag) => {
         const normalized = tag.toLowerCase();
-        if (normalized !== "github") uniqueTags.add(normalized);
+        if (["github", "python", "pythin", "jupyter", "jupyter notebook"].includes(normalized)) return;
+        uniqueTags.add(normalized);
       });
     });
 
@@ -102,6 +172,24 @@ export function PortfolioPage() {
   const pinnedProjects = visibleProjects.filter((project) => project.isPinned).slice(0, 3);
   const recentProjects = visibleProjects.filter((project) => !project.isPinned);
 
+  const languageDonut = useMemo(() => {
+    if (languageStats.length === 0) return "";
+
+    let cursor = 0;
+    const segments = languageStats.map((item, index) => {
+      const start = cursor;
+      const end = cursor + item.percent;
+      cursor = end;
+      return `${getLanguageColor(item.language, index)} ${start}% ${end}%`;
+    });
+
+    if (cursor < 100) {
+      segments.push(`#334155 ${cursor}% 100%`);
+    }
+
+    return `conic-gradient(${segments.join(", ")})`;
+  }, [languageStats]);
+
   useEffect(() => {
     document.title = content.profile.metadata.title;
 
@@ -117,13 +205,37 @@ export function PortfolioPage() {
     updateMeta('meta[name="twitter:description"]', content.profile.metadata.description);
   }, [content.profile.metadata.description, content.profile.metadata.title]);
 
+  useEffect(() => {
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
+    if (nodes.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: "0px 0px -10% 0px",
+      },
+    );
+
+    nodes.forEach((node) => observer.observe(node));
+
+    return () => observer.disconnect();
+  }, [projects, locale]);
+
   return (
     <>
       <Header />
 
       <main className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col gap-20 px-4 py-10 md:px-6 md:py-16">
         <section id="home" className="grid items-center gap-8 md:grid-cols-[1.1fr_0.9fr] md:gap-10">
-          <div className="space-y-6">
+          <div className="space-y-6" data-reveal>
             <span className="inline-flex rounded-full border border-brand-300 bg-brand-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-brand-700 dark:border-brand-500/40 dark:bg-slate-900 dark:text-brand-200">
               {content.profile.title}
             </span>
@@ -171,19 +283,73 @@ export function PortfolioPage() {
             </div>
           </div>
 
-          <div className="mx-auto w-full max-w-xs rounded-3xl border border-brand-300/50 bg-linear-to-b from-brand-100 to-white p-3 shadow-xl dark:border-brand-500/35 dark:from-slate-900 dark:to-slate-950">
+          <div
+            className="mx-auto flex h-72 w-72 items-center justify-center rounded-full border border-brand-300/60 bg-linear-to-b from-brand-100 to-white p-3 shadow-xl dark:border-brand-500/35 dark:from-slate-900 dark:to-slate-950"
+            data-reveal
+          >
             <Image
               src="/avatar.jpg"
               alt="Lucas Limeira"
               width={400}
-              height={500}
-              className="h-80 w-full rounded-2xl object-cover"
+              height={400}
+              className="h-full w-full rounded-full object-cover"
             />
           </div>
         </section>
 
-        <section id="projects" className="space-y-6">
+        <section id="projects" className="space-y-6" data-reveal>
           <SectionTitle title={content.profile.sections.projects} subtitle={content.profile.projectsUi.filterLabel} />
+
+          {languageStats.length > 0 ? (
+            <article className="rounded-3xl border border-brand-200/80 bg-white/80 p-5 shadow-sm dark:border-brand-500/25 dark:bg-slate-900/70 md:p-7">
+              <h3 className="text-sm font-bold uppercase tracking-[0.16em] text-brand-700 dark:text-brand-200">
+                {locale === "pt" ? "Linguagens mais usadas" : "Most used languages"}
+              </h3>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                {locale === "pt"
+                  ? "Resumo das linguagens principais dos seus repositórios no GitHub."
+                  : "Summary of your top repository languages from GitHub."}
+              </p>
+              <div className="mt-6 grid items-center gap-6 md:grid-cols-[220px_1fr]">
+                <div className="mx-auto flex h-44 w-44 items-center justify-center rounded-full p-4" style={{ background: languageDonut }}>
+                  <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-white text-center dark:bg-slate-950">
+                    <p className="text-3xl font-black text-slate-900 dark:text-slate-100">
+                      {languageStats[0]?.percent.toFixed(1)}%
+                    </p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">
+                      {languageStats[0]?.language}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {languageStats.map((stat, index) => (
+                    <div key={stat.language} className="space-y-1">
+                      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">
+                        <span className="inline-flex items-center gap-2">
+                          <span
+                            className="h-2.5 w-2.5 rounded-full"
+                            style={{ backgroundColor: getLanguageColor(stat.language, index) }}
+                          />
+                          {stat.language}
+                        </span>
+                        <span>{stat.percent.toFixed(1)}%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-800">
+                        <div
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${Math.max(5, stat.percent)}%`,
+                            backgroundColor: getLanguageColor(stat.language, index),
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </article>
+          ) : null}
 
           <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
@@ -209,37 +375,29 @@ export function PortfolioPage() {
           ) : null}
 
           {pinnedProjects.length > 0 ? (
-            <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-brand-700 dark:text-brand-200">
-                {locale === "pt" ? "Pinned (Top 3)" : "Pinned (Top 3)"}
-              </p>
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {pinnedProjects.map((project) => (
-                  <ProjectCard key={project.slug} project={project} onOpen={setSelectedProject} locale={locale} />
-                ))}
-              </div>
-            </div>
+            <ProjectsCarousel
+              title={locale === "pt" ? "Pinned (Top 3)" : "Pinned (Top 3)"}
+              projects={pinnedProjects}
+              locale={locale}
+              onOpen={setSelectedProject}
+            />
           ) : null}
 
-          <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-brand-700 dark:text-brand-200">
-              {locale === "pt" ? "Recentes" : "Recent"}
-            </p>
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {recentProjects.map((project) => (
-                <ProjectCard key={project.slug} project={project} onOpen={setSelectedProject} locale={locale} />
-              ))}
-            </div>
-          </div>
+          <ProjectsCarousel
+            title={locale === "pt" ? "Recentes" : "Recent"}
+            projects={recentProjects}
+            locale={locale}
+            onOpen={setSelectedProject}
+          />
         </section>
 
-        <section id="services" className="space-y-6">
+        <section id="services" className="space-y-6" data-reveal>
           <SectionTitle title={content.profile.sections.services} subtitle={content.profile.servicesIntro} />
           <div className="grid gap-4 md:grid-cols-2">
             {content.services.map((service: ServiceItem) => (
               <article
                 key={service.title}
-                className="rounded-2xl border border-brand-200/80 bg-white/80 p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-400 hover:shadow-lg dark:border-brand-500/25 dark:bg-slate-900/70 dark:hover:border-brand-300/60"
+                className="rounded-2xl border border-brand-200/80 bg-white/80 p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-brand-400 hover:shadow-2xl hover:shadow-brand-500/25 dark:border-brand-500/25 dark:bg-slate-900/70 dark:hover:border-brand-300/60 dark:hover:shadow-brand-500/20"
               >
                 <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{service.title}</h3>
                 <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{service.description}</p>
@@ -248,13 +406,13 @@ export function PortfolioPage() {
           </div>
         </section>
 
-        <section id="education" className="space-y-6">
+        <section id="education" className="space-y-6" data-reveal>
           <SectionTitle title={content.profile.sections.education} />
           <div className="space-y-3">
             {content.education.map((item: EducationItem) => (
               <article
                 key={item.title}
-                className="rounded-2xl border border-brand-200/80 bg-white/80 p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-400 hover:shadow-lg dark:border-brand-500/25 dark:bg-slate-900/70 dark:hover:border-brand-300/60"
+                className="rounded-2xl border border-brand-200/80 bg-white/80 p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-brand-400 hover:shadow-2xl hover:shadow-brand-500/25 dark:border-brand-500/25 dark:bg-slate-900/70 dark:hover:border-brand-300/60 dark:hover:shadow-brand-500/20"
               >
                 <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{item.title}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400">{item.institution}</p>
@@ -264,24 +422,39 @@ export function PortfolioPage() {
           </div>
         </section>
 
-        <section id="contact" className="space-y-6">
+        <section id="contact" className="space-y-6" data-reveal>
           <SectionTitle title={content.profile.sections.contact} subtitle={content.profile.contactText} />
 
-          <div className="flex flex-wrap gap-3">
-            <Button href={whatsappUrl} target="_blank" rel="noreferrer noopener">
-              WhatsApp
-            </Button>
-            <Button
-              href="https://www.linkedin.com/in/lucas-de-lucena-limeira"
-              target="_blank"
-              rel="noreferrer noopener"
-              variant="ghost"
-            >
-              LinkedIn
-            </Button>
-            <Button href="mailto:lucasdllimeira@gmail.com" variant="ghost">
-              Email
-            </Button>
+          <div className="rounded-3xl border border-brand-200/80 bg-white/80 p-6 shadow-sm md:p-10 dark:border-brand-500/25 dark:bg-slate-900/70">
+            <div className="space-y-5">
+              <p className="max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                {locale === "pt"
+                  ? "Vamos conversar sobre seu projeto. Escolha o canal que preferir e te respondo com um plano objetivo para tirar a ideia do papel."
+                  : "Let's talk about your project. Choose your preferred channel and I'll reply with a clear plan to bring your idea to life."}
+              </p>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <Button
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="px-4 py-2 text-xs"
+                >
+                  WhatsApp
+                </Button>
+                <Button
+                  href="https://www.linkedin.com/in/lucas-de-lucena-limeira"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  variant="ghost"
+                  className="px-4 py-2 text-xs"
+                >
+                  LinkedIn
+                </Button>
+                <Button href="mailto:lucasdllimeira@gmail.com" variant="ghost" className="px-4 py-2 text-xs">
+                  Email
+                </Button>
+              </div>
+            </div>
           </div>
         </section>
       </main>

@@ -95,3 +95,55 @@ input[type="button"],
 input[type="submit"] {
   cursor: pointer;
 }
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(24px) scale(0.985);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.carousel-track {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: 2.85rem;
+  scroll-padding-right: 2.85rem;
+  padding: 0.9rem 2.85rem 1.2rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-item {
+  box-sizing: border-box;
+  padding: 0.15rem 0.1rem 0.55rem;
+  min-width: min(84vw, 330px);
+  max-width: min(84vw, 330px);
+  scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+  .carousel-track {
+    scroll-padding-left: 3.1rem;
+    scroll-padding-right: 3.1rem;
+    padding-left: 3.1rem;
+    padding-right: 3.1rem;
+  }
+
+  .carousel-item {
+    min-width: 320px;
+    max-width: 320px;
+  }
+}

@@ -48,8 +48,9 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-brand-200/50 bg-white/75 backdrop-blur-md dark:border-brand-500/20 dark:bg-slate-950/65">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-3 md:px-6">
+    <header className="sticky top-3 z-40 px-4 md:px-6">
+      <div className="mx-auto w-full max-w-6xl">
+        <div className="flex items-center justify-between gap-2 rounded-full border border-brand-200/60 bg-white/80 px-4 py-3 shadow-lg shadow-brand-500/10 backdrop-blur-md dark:border-brand-500/25 dark:bg-slate-950/70">
         <a href="#home" className="text-sm font-black tracking-wide text-slate-950 dark:text-white">
           Lucas Limeira
         </a>
@@ -88,6 +89,7 @@ export function Header() {
             <Moon className="h-4 w-4 dark:hidden" strokeWidth={2} />
             <Sun className="hidden h-4 w-4 dark:inline" strokeWidth={2} />
           </button>
+        </div>
         </div>
       </div>
     </header>

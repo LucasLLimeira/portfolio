@@ -60,6 +60,15 @@ export function ProjectModal({
             {project.description}
           </p>
 
+          {project.language ? (
+            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-300">
+              <span className="rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-brand-700 dark:border-brand-500/30 dark:bg-slate-800 dark:text-brand-200">
+                {project.language}
+                {typeof project.languagePercent === "number" ? ` ${project.languagePercent.toFixed(1)}%` : ""}
+              </span>
+            </div>
+          ) : null}
+
           <div className="flex flex-wrap gap-2">
             {project.tags.map((tag) => (
               <span

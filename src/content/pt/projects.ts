@@ -1,6 +1,10 @@
 import type { Project } from "@/types/content";
 
-export const featuredRepoNames = ["todo-list", "landing-page", "cadastro-de-usuario"];
+export const featuredRepoNames = [
+  "ToDo-React-Avancado",
+  "portfolio",
+  "catalogo-livros-ts",
+];
 
 export const projects: Project[] = [
   {

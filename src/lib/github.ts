@@ -103,23 +103,52 @@ function extractRepoPrimaryLanguages(repositoriesHtml: string): Map<string, stri
   return map;
 }
 
+async function fetchRepoLanguageBreakdownByName(
+  repoName: string,
+  headers: HeadersInit,
+): Promise<LanguageStat[]> {
+  try {
+    const response = await fetch(
+      `https://api.github.com/repos/LucasLLimeira/${encodeURIComponent(repoName)}/languages`,
+      {
+        headers,
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) return [];
+
+    const payload = (await response.json()) as Record<string, number>;
+    const total = Object.values(payload).reduce((acc, value) => acc + value, 0);
+    if (!total) return [];
+
+    return Object.entries(payload)
+      .map(([language, bytes]) => ({
+        language,
+        percent: Math.round((bytes / total) * 1000) / 10,
+      }))
+      .sort((a, b) => b.percent - a.percent)
+      .slice(0, 4);
+  } catch {
+    return [];
+  }
+}
+
 async function fetchHtmlGithubProjects(
   featuredRepoNames: string[],
   fallbackProjects: Project[],
   locale: Locale,
 ): Promise<Project[]> {
+  const headers = getGithubHeaders();
+
   const [profileResponse, repositoriesResponse] = await Promise.all([
     fetch(GITHUB_PROFILE, {
       cache: "no-store",
-      headers: {
-        "User-Agent": "portfolio-app",
-      },
+      headers,
     }),
     fetch(GITHUB_REPOSITORIES_TAB, {
       cache: "no-store",
-      headers: {
-        "User-Agent": "portfolio-app",
-      },
+      headers,
     }),
   ]);
 
@@ -151,31 +180,46 @@ async function fetchHtmlGithubProjects(
 
   if (uniqueSelectedNames.length === 0) return fallbackProjects;
 
-  return uniqueSelectedNames.map((repoName) => {
+  const mappedProjects = await Promise.all(
+    uniqueSelectedNames.map(async (repoName) => {
     const localMatch = fallbackProjects.find(
       (project) =>
         project.slug.toLowerCase() === repoName.toLowerCase() ||
         project.title.toLowerCase() === repoName.toLowerCase(),
     );
 
-    const primaryLanguage = repoLanguageMap.get(repoName.toLowerCase());
+      const primaryLanguageFromHtml = repoLanguageMap.get(repoName.toLowerCase());
+      const apiLanguagesBreakdown = await fetchRepoLanguageBreakdownByName(repoName, headers);
+      const languagesBreakdown =
+        apiLanguagesBreakdown.length > 0
+          ? apiLanguagesBreakdown
+          : primaryLanguageFromHtml
+            ? [{ language: primaryLanguageFromHtml, percent: 100 }]
+            : [];
 
-    return {
-      slug: repoName,
-      title: localMatch?.title ?? repoName,
-      description:
-        localMatch?.description ??
-        (locale === "pt" ? "Projeto importado do GitHub." : "Project imported from GitHub."),
-      tags: localMatch?.tags.length ? localMatch.tags : [],
-      githubUrl: `https://github.com/LucasLLimeira/${repoName}`,
-      demoUrl: localMatch?.demoUrl,
-      image: localMatch?.image,
-      language: primaryLanguage,
-      languagePercent: primaryLanguage ? 100 : undefined,
-      languagesBreakdown: primaryLanguage ? [{ language: primaryLanguage, percent: 100 }] : [],
-      isPinned: pinnedSlugSet.has(repoName.toLowerCase()),
-    };
-  });
+      const primaryLanguage = languagesBreakdown[0]?.language;
+      const primaryPercent = languagesBreakdown[0]?.percent;
+
+      return {
+        slug: repoName,
+        title: localMatch?.title ?? repoName,
+        description:
+          localMatch?.description ??
+          (locale === "pt" ? "Projeto importado do GitHub." : "Project imported from GitHub."),
+        tags: localMatch?.tags.length ? localMatch.tags : [],
+        githubUrl: `https://github.com/LucasLLimeira/${repoName}`,
+        demoUrl: localMatch?.demoUrl,
+        image: localMatch?.image,
+        previewVideo: localMatch?.previewVideo,
+        language: primaryLanguage,
+        languagePercent: primaryPercent,
+        languagesBreakdown,
+        isPinned: pinnedSlugSet.has(repoName.toLowerCase()),
+      };
+    }),
+  );
+
+  return mappedProjects;
 }
 
 function extractLanguagesFromRepositoriesHtml(repositoriesHtml: string): string[] {
@@ -329,6 +373,7 @@ export async function fetchFeaturedGithubProjects(
         githubUrl: repo.html_url,
         demoUrl: localMatch?.demoUrl ?? repo.homepage ?? undefined,
         image: localMatch?.image,
+        previewVideo: localMatch?.previewVideo,
         language: primaryLanguage,
         stars: repo.stargazers_count,
         forks: repo.forks_count,

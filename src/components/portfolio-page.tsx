@@ -300,11 +300,11 @@ export function PortfolioPage() {
             data-reveal
           >
             <Image
-              src="/avatar.jpg"
+              src="/avatar.JPG"
               alt="Lucas Limeira"
               width={400}
               height={400}
-              className="h-full w-full rounded-full object-cover"
+              className="h-full w-full rounded-full object-cover object-[center_38%]"
             />
           </div>
         </section>
@@ -507,7 +507,9 @@ export function PortfolioPage() {
       <ProjectModal
         project={selectedProject}
         onClose={() => setSelectedProject(null)}
+        locale={locale}
         viewDemoLabel={content.profile.projectsUi.viewDemo}
+        viewRepoLabel={content.profile.projectsUi.viewRepo}
         noDemoLabel={content.profile.projectsUi.noDemo}
       />
     </>

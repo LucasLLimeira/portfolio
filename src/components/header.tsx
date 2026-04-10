@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type MouseEvent } from "react";
 
 import { useLocaleToggle } from "@/contexts/locale-context";
 import { getContent } from "@/lib/content";
@@ -14,30 +14,75 @@ export function Header() {
   const content = useMemo(() => getContent(locale), [locale]);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntries = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+    const updateActiveSection = () => {
+      const nav = document.querySelector<HTMLElement>("header[data-app-nav='true']");
+      const navHeight = nav?.offsetHeight ?? 72;
+      const focusLine = Math.max(navHeight + 24, window.innerHeight * 0.34);
 
-        const current = visibleEntries[0];
-        if (current) {
-          setActiveSection(current.target.id);
+      let current: string = sectionOrder[0];
+      let crossedAny = false;
+
+      for (const id of sectionOrder) {
+        const element = document.getElementById(id);
+        if (!element) continue;
+
+        const rect = element.getBoundingClientRect();
+        // Keep the active section aligned with the title area the user is currently reading.
+        if (rect.top <= focusLine) {
+          current = id;
+          crossedAny = true;
         }
-      },
-      {
-        rootMargin: "-35% 0px -45% 0px",
-        threshold: [0.15, 0.3, 0.45, 0.6],
-      },
-    );
+      }
 
-    sectionOrder.forEach((id) => {
-      const element = document.getElementById(id);
-      if (element) observer.observe(element);
-    });
+      if (!crossedAny) {
+        current = sectionOrder[0];
+      }
 
-    return () => observer.disconnect();
+      const nearPageBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8;
+
+      if (nearPageBottom) {
+        current = sectionOrder[sectionOrder.length - 1];
+      }
+
+      setActiveSection(current);
+    };
+
+    updateActiveSection();
+    let ticking = false;
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        updateActiveSection();
+        ticking = false;
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", updateActiveSection);
+    };
   }, []);
+
+  const scrollToSection = (section: string, event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+
+    const element = document.getElementById(section);
+    if (!element) return;
+
+    const nav = document.querySelector<HTMLElement>("header[data-app-nav='true']");
+    const navHeight = nav?.offsetHeight ?? 72;
+    const top = element.getBoundingClientRect().top + window.scrollY - (navHeight + 18);
+
+    window.history.replaceState(null, "", `#${section}`);
+    window.scrollTo({ top, behavior: "smooth" });
+    setActiveSection(section);
+  };
 
   const navMap = {
     home: content.profile.nav.home,
@@ -49,7 +94,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-3 z-40 px-4 md:px-6">
+    <header data-app-nav="true" className="sticky top-3 z-40 px-4 md:px-6">
       <div className="mx-auto w-full max-w-6xl">
         <div className="flex items-center justify-between gap-2 rounded-full border border-brand-200/60 bg-white/80 px-4 py-3 shadow-lg shadow-brand-500/10 backdrop-blur-md dark:border-brand-500/25 dark:bg-slate-950/70">
         <a href="#home" className="text-sm font-black tracking-wide text-slate-950 dark:text-white">
@@ -61,6 +106,7 @@ export function Header() {
             <a
               key={section}
               href={`#${section}`}
+              onClick={(event) => scrollToSection(section, event)}
               className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
                 activeSection === section
                   ? "bg-brand-500 text-white dark:bg-brand-300 dark:text-slate-950"

@@ -59,6 +59,7 @@ export type Project = {
   githubUrl: string;
   demoUrl?: string;
   image?: string;
+  previewVideo?: string;
   language?: string;
   stars?: number;
   forks?: number;

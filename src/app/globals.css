@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f3f8ff;
+  --foreground: #0f172a;
+  --brand-50: #e8f1ff;
+  --brand-100: #d4e6ff;
+  --brand-200: #b5d2ff;
+  --brand-300: #8ab6ff;
+  --brand-400: #5f93f0;
+  --brand-500: #306bd3;
+  --brand-600: #2150a8;
+}
+
+[data-theme="dark"] {
+  --background: #060c1a;
+  --foreground: #e2ebff;
+  --brand-50: #0f1e3b;
+  --brand-100: #14284b;
+  --brand-200: #1b3766;
+  --brand-300: #29558f;
+  --brand-400: #3f79c2;
+  --brand-500: #5ea3ff;
+  --brand-600: #81bbff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+  min-height: 100%;
+}
+
+body {
+  position: relative;
+  min-height: 100vh;
+  color: var(--foreground);
+  background: var(--background);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+  inset: -25% -10%;
+  opacity: 0.42;
+  filter: blur(80px);
+  transform: translateZ(0);
+  background:
+    radial-gradient(circle at 18% 22%, #c8ddff 0%, transparent 34%),
+    radial-gradient(circle at 82% 18%, #aacdff 0%, transparent 32%),
+    radial-gradient(circle at 50% 78%, #8eb9ff 0%, transparent 38%);
+  animation: aura-flow 26s ease-in-out infinite alternate;
+}
+
+[data-theme="dark"] body {
+  background: var(--background);
+}
+
+[data-theme="dark"] body::before {
+  opacity: 0.36;
+  background:
+    radial-gradient(circle at 18% 22%, #1b3766 0%, transparent 34%),
+    radial-gradient(circle at 82% 18%, #29558f 0%, transparent 32%),
+    radial-gradient(circle at 50% 78%, #3f79c2 0%, transparent 38%);
+}
+
+@keyframes aura-flow {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(-2rem, 1.2rem, 0) scale(1.06);
+  }
+}
+
+a[href],
+button,
+[role="button"],
+input[type="button"],
+input[type="submit"] {
+  cursor: pointer;
+}

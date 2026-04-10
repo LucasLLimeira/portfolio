@@ -12,6 +12,7 @@ export const profile: ProfileContent = {
   },
   nav: {
     home: "Início",
+    about: "Sobre",
     projects: "Projetos",
     services: "Serviços",
     education: "Formação",
@@ -24,10 +25,24 @@ export const profile: ProfileContent = {
     downloadCv: "Baixar CV",
   },
   sections: {
+    about: "Sobre",
     projects: "Projetos",
     services: "Serviços",
     education: "Formação e certificados",
     contact: "Contato",
+  },
+  about: {
+    kicker: "Sobre mim",
+    title: "Minha trajetoria",
+    description:
+      "Comecei desenvolvendo projetos práticos para consolidar base em front-end e, com o tempo, evoluí para aplicações fullstack com foco em entrega real. Hoje trabalho unindo experiência de usuário, performance e organização de código para transformar ideias em produtos úteis e bem construídos.",
+    highlights: [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Node.js",
+      "Tailwind CSS",
+    ],
   },
   projectsUi: {
     filterLabel: "Filtrar por tecnologia",

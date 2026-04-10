@@ -12,6 +12,7 @@ export type ProfileContent = {
   };
   nav: {
     home: string;
+    about: string;
     projects: string;
     services: string;
     education: string;
@@ -24,10 +25,17 @@ export type ProfileContent = {
     downloadCv: string;
   };
   sections: {
+    about: string;
     projects: string;
     services: string;
     education: string;
     contact: string;
+  };
+  about: {
+    kicker: string;
+    title: string;
+    description: string;
+    highlights: string[];
   };
   projectsUi: {
     filterLabel: string;

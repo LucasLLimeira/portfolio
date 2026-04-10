@@ -12,6 +12,7 @@ export const profile: ProfileContent = {
   },
   nav: {
     home: "Home",
+    about: "About",
     projects: "Projects",
     services: "Services",
     education: "Education",
@@ -24,10 +25,24 @@ export const profile: ProfileContent = {
     downloadCv: "Download CV",
   },
   sections: {
+    about: "About",
     projects: "Projects",
     services: "Services",
     education: "Education & certificates",
     contact: "Contact",
+  },
+  about: {
+    kicker: "About me",
+    title: "My journey",
+    description:
+      "I started by building practical projects to strengthen my front-end foundation and gradually evolved into fullstack application development focused on real delivery. Today, I combine user experience, performance, and clean code structure to turn ideas into useful and well-crafted products.",
+    highlights: [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Node.js",
+      "Tailwind CSS",
+    ],
   },
   projectsUi: {
     filterLabel: "Filter by technology",

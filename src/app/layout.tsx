@@ -53,6 +53,7 @@ export default async function RootLayout({
   return (
     <html
       lang={initialLocale ?? DEFAULT_LOCALE}
+      data-theme="dark"
       suppressHydrationWarning
       className={`${spaceGrotesk.variable} ${jetBrainsMono.variable} h-full antialiased`}
     >

@@ -1,17 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Moon, Sun } from "lucide-react";
 
 import { useLocaleToggle } from "@/contexts/locale-context";
-import { useTheme } from "@/contexts/theme-context";
 import { getContent } from "@/lib/content";
 
-const sectionOrder = ["home", "projects", "services", "education", "contact"] as const;
+const sectionOrder = ["home", "about", "projects", "services", "education", "contact"] as const;
 
 export function Header() {
   const { locale, toggleLocale } = useLocaleToggle();
-  const { toggleTheme } = useTheme();
   const [activeSection, setActiveSection] = useState<string>("home");
 
   const content = useMemo(() => getContent(locale), [locale]);
@@ -19,15 +16,18 @@ export function Header() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+        const current = visibleEntries[0];
+        if (current) {
+          setActiveSection(current.target.id);
         }
       },
       {
-        rootMargin: "-40% 0px -45% 0px",
-        threshold: 0.1,
+        rootMargin: "-35% 0px -45% 0px",
+        threshold: [0.15, 0.3, 0.45, 0.6],
       },
     );
 
@@ -41,6 +41,7 @@ export function Header() {
 
   const navMap = {
     home: content.profile.nav.home,
+    about: content.profile.nav.about,
     projects: content.profile.nav.projects,
     services: content.profile.nav.services,
     education: content.profile.nav.education,
@@ -79,15 +80,6 @@ export function Header() {
             aria-label="toggle language"
           >
             {locale === "pt" ? "PT" : "EN"}
-          </button>
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="rounded-full border border-brand-300 bg-white/90 px-3 py-1.5 text-xs font-semibold text-slate-900 transition hover:bg-brand-100 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
-            aria-label="toggle theme"
-          >
-            <Moon className="h-4 w-4 dark:hidden" strokeWidth={2} />
-            <Sun className="hidden h-4 w-4 dark:inline" strokeWidth={2} />
           </button>
         </div>
         </div>

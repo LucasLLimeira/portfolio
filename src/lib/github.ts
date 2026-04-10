@@ -87,6 +87,22 @@ function extractRecentNames(repositoriesHtml: string): string[] {
   return parseRepoNamesFromSection(repositoriesHtml);
 }
 
+function extractRepoPrimaryLanguages(repositoriesHtml: string): Map<string, string> {
+  const map = new Map<string, string>();
+  const regex =
+    /href="\/LucasLLimeira\/([^"\/?#]+)"[\s\S]{0,2200}?itemprop="programmingLanguage"[^>]*>\s*([^<]+)\s*</g;
+
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(repositoriesHtml)) !== null) {
+    const repoName = decodeURIComponent(match[1]).trim();
+    const language = match[2]?.trim();
+    if (!repoName || !language || map.has(repoName.toLowerCase())) continue;
+    map.set(repoName.toLowerCase(), language);
+  }
+
+  return map;
+}
+
 async function fetchHtmlGithubProjects(
   featuredRepoNames: string[],
   fallbackProjects: Project[],
@@ -118,6 +134,7 @@ async function fetchHtmlGithubProjects(
 
   const pinnedNames = extractPinnedNames(profileHtml);
   const recentNames = extractRecentNames(repositoriesHtml);
+  const repoLanguageMap = extractRepoPrimaryLanguages(repositoriesHtml);
 
   const orderedPinned =
     pinnedNames.length > 0
@@ -141,6 +158,8 @@ async function fetchHtmlGithubProjects(
         project.title.toLowerCase() === repoName.toLowerCase(),
     );
 
+    const primaryLanguage = repoLanguageMap.get(repoName.toLowerCase());
+
     return {
       slug: repoName,
       title: localMatch?.title ?? repoName,
@@ -151,6 +170,9 @@ async function fetchHtmlGithubProjects(
       githubUrl: `https://github.com/LucasLLimeira/${repoName}`,
       demoUrl: localMatch?.demoUrl,
       image: localMatch?.image,
+      language: primaryLanguage,
+      languagePercent: primaryLanguage ? 100 : undefined,
+      languagesBreakdown: primaryLanguage ? [{ language: primaryLanguage, percent: 100 }] : [],
       isPinned: pinnedSlugSet.has(repoName.toLowerCase()),
     };
   });

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Mail } from "lucide-react";
+import { ChevronLeft, ChevronRight, Mail, MessageCircle } from "lucide-react";
 
 import { Badge } from "@/components/badge";
 import { Button } from "@/components/button";
@@ -23,6 +23,24 @@ const whatsappMessage = encodeURIComponent(
   "Olá Quero entrar em contato para um projeto/proposta",
 );
 const whatsappUrl = `https://wa.me/5583998760660?text=${whatsappMessage}`;
+
+function getProjectFilterTerms(project: Project) {
+  const terms = new Set<string>();
+
+  project.tags.forEach((tag) => terms.add(tag.toLowerCase()));
+
+  project.languagesBreakdown?.forEach((item) => {
+    terms.add(item.language.toLowerCase());
+  });
+
+  if (project.language) terms.add(project.language.toLowerCase());
+
+  ["github", "python", "pythin", "jupyter", "jupyter notebook"].forEach((blocked) => {
+    terms.delete(blocked);
+  });
+
+  return Array.from(terms);
+}
 
 function GithubMark() {
   return (
@@ -152,11 +170,7 @@ export function PortfolioPage() {
   const tags = useMemo(() => {
     const uniqueTags = new Set<string>();
     projects.forEach((project) => {
-      project.tags.forEach((tag) => {
-        const normalized = tag.toLowerCase();
-        if (["github", "python", "pythin", "jupyter", "jupyter notebook"].includes(normalized)) return;
-        uniqueTags.add(normalized);
-      });
+      getProjectFilterTerms(project).forEach((term) => uniqueTags.add(term));
     });
 
     return ["all", ...Array.from(uniqueTags)];
@@ -165,9 +179,7 @@ export function PortfolioPage() {
   const visibleProjects =
     activeTag === "all"
       ? projects
-      : projects.filter((project) =>
-          project.tags.some((tag) => tag.toLowerCase() === activeTag),
-        );
+      : projects.filter((project) => getProjectFilterTerms(project).includes(activeTag));
 
   const pinnedProjects = visibleProjects.filter((project) => project.isPinned).slice(0, 3);
   const recentProjects = visibleProjects.filter((project) => !project.isPinned);
@@ -242,7 +254,7 @@ export function PortfolioPage() {
             <h1 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-slate-100">
               {content.profile.hero.greeting} <br /> {content.profile.name}
             </h1>
-            <p className="max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg dark:text-slate-300">
+            <p className="max-w-xl text-base leading-relaxed text-slate-700 sm:text-lg dark:text-slate-300">
               {content.profile.shortBio}
             </p>
             <div className="flex flex-wrap gap-3">
@@ -297,6 +309,31 @@ export function PortfolioPage() {
           </div>
         </section>
 
+        <section id="about" className="space-y-6" data-reveal>
+          <article className="rounded-3xl border border-brand-200/80 bg-white/85 p-6 shadow-sm dark:border-brand-500/25 dark:bg-slate-900/70 md:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-700 dark:text-brand-200">
+              {content.profile.about.kicker}
+            </p>
+            <h3 className="mt-2 max-w-3xl text-2xl font-bold text-slate-950 dark:text-slate-100 md:text-3xl">
+              {content.profile.about.title}
+            </h3>
+            <p className="mt-4 max-w-4xl text-base leading-relaxed text-slate-700 dark:text-slate-300">
+              {content.profile.about.description}
+            </p>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              {content.profile.about.highlights.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-brand-300/80 bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700 dark:border-brand-500/35 dark:bg-slate-800 dark:text-brand-200"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </article>
+        </section>
+
         <section id="projects" className="space-y-6" data-reveal>
           <SectionTitle title={content.profile.sections.projects} subtitle={content.profile.projectsUi.filterLabel} />
 
@@ -305,7 +342,7 @@ export function PortfolioPage() {
               <h3 className="text-sm font-bold uppercase tracking-[0.16em] text-brand-700 dark:text-brand-200">
                 {locale === "pt" ? "Linguagens mais usadas" : "Most used languages"}
               </h3>
-              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+              <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">
                 {locale === "pt"
                   ? "Resumo das linguagens principais dos seus repositórios no GitHub."
                   : "Summary of your top repository languages from GitHub."}
@@ -423,37 +460,43 @@ export function PortfolioPage() {
         </section>
 
         <section id="contact" className="space-y-6" data-reveal>
-          <SectionTitle title={content.profile.sections.contact} subtitle={content.profile.contactText} />
+          <SectionTitle title={content.profile.sections.contact} />
 
-          <div className="rounded-3xl border border-brand-200/80 bg-white/80 p-6 shadow-sm md:p-10 dark:border-brand-500/25 dark:bg-slate-900/70">
-            <div className="space-y-5">
-              <p className="max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+          <div className="rounded-3xl border border-brand-300/45 bg-linear-to-r from-slate-950/96 via-[#06153a]/94 to-[#07233f]/92 p-7 shadow-xl shadow-brand-500/10 md:p-10 dark:border-brand-500/35">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-200/90">
+              {locale === "pt" ? "Contato Direto" : "Direct Contact"}
+            </p>
+            <h3 className="mt-3 text-3xl font-bold text-white md:text-4xl">
+              {locale === "pt" ? "Vamos construir algo grande?" : "Shall we build something big?"}
+            </h3>
+            <p className="mt-4 max-w-3xl text-base leading-relaxed text-slate-200/90">
+              {locale === "pt"
+                ? "Se voce tem uma ideia, produto ou evolucao tecnica em mente, podemos desenhar a melhor forma de construir juntos."
+                : "If you have an idea, product, or technical upgrade in mind, we can map the best way to build it together."}
+            </p>
+
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <Button
+                href={whatsappUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="gap-2 px-5 py-2.5 text-sm"
+              >
+                <MessageCircle className="h-4 w-4" />
+                {locale === "pt" ? "Enviar mensagem" : "Send message"}
+              </Button>
+              <Button
+                href="mailto:lucasdllimeira@gmail.com"
+                variant="ghost"
+                className="border-brand-300/40 bg-transparent px-4 py-2 text-xs text-slate-100 hover:bg-white/10 dark:border-brand-300/35"
+              >
+                Email
+              </Button>
+              <span className="text-sm text-slate-300/85">
                 {locale === "pt"
-                  ? "Vamos conversar sobre seu projeto. Escolha o canal que preferir e te respondo com um plano objetivo para tirar a ideia do papel."
-                  : "Let's talk about your project. Choose your preferred channel and I'll reply with a clear plan to bring your idea to life."}
-              </p>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <Button
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="px-4 py-2 text-xs"
-                >
-                  WhatsApp
-                </Button>
-                <Button
-                  href="https://www.linkedin.com/in/lucas-de-lucena-limeira"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  variant="ghost"
-                  className="px-4 py-2 text-xs"
-                >
-                  LinkedIn
-                </Button>
-                <Button href="mailto:lucasdllimeira@gmail.com" variant="ghost" className="px-4 py-2 text-xs">
-                  Email
-                </Button>
-              </div>
+                  ? "Disponivel para novos projetos e colaboracoes"
+                  : "Available for new projects and collaborations"}
+              </span>
             </div>
           </div>
         </section>

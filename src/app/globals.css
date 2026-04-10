@@ -1,18 +1,8 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f3f8ff;
-  --foreground: #0f172a;
-  --brand-50: #e8f1ff;
-  --brand-100: #d4e6ff;
-  --brand-200: #b5d2ff;
-  --brand-300: #8ab6ff;
-  --brand-400: #5f93f0;
-  --brand-500: #306bd3;
-  --brand-600: #2150a8;
-}
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-[data-theme="dark"] {
+:root {
   --background: #060c1a;
   --foreground: #e2ebff;
   --brand-50: #0f1e3b;
@@ -57,21 +47,21 @@ body::before {
   z-index: -1;
   pointer-events: none;
   inset: -25% -10%;
-  opacity: 0.42;
+  opacity: 0.24;
   filter: blur(80px);
   transform: translateZ(0);
   background:
-    radial-gradient(circle at 18% 22%, #c8ddff 0%, transparent 34%),
-    radial-gradient(circle at 82% 18%, #aacdff 0%, transparent 32%),
-    radial-gradient(circle at 50% 78%, #8eb9ff 0%, transparent 38%);
+    radial-gradient(circle at 18% 22%, #a9c6f0 0%, transparent 34%),
+    radial-gradient(circle at 82% 18%, #8fb4e9 0%, transparent 32%),
+    radial-gradient(circle at 50% 78%, #78a3df 0%, transparent 38%);
   animation: aura-flow 26s ease-in-out infinite alternate;
 }
 
-[data-theme="dark"] body {
+body {
   background: var(--background);
 }
 
-[data-theme="dark"] body::before {
+body::before {
   opacity: 0.36;
   background:
     radial-gradient(circle at 18% 22%, #1b3766 0%, transparent 34%),

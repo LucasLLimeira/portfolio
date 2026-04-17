@@ -105,9 +105,9 @@ input[type="submit"] {
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
-  scroll-padding-left: 2.85rem;
-  scroll-padding-right: 2.85rem;
-  padding: 0.9rem 2.85rem 1.2rem;
+  scroll-padding-left: 0.45rem;
+  scroll-padding-right: 0.45rem;
+  padding: 0.9rem 0.45rem 1.2rem;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -119,8 +119,8 @@ input[type="submit"] {
 .carousel-item {
   box-sizing: border-box;
   padding: 0.15rem 0.1rem 0.55rem;
-  min-width: min(84vw, 330px);
-  max-width: min(84vw, 330px);
+  min-width: min(88vw, 330px);
+  max-width: min(88vw, 330px);
   scroll-snap-align: start;
 }
 

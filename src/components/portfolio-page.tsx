@@ -85,15 +85,26 @@ function ProjectsCarousel({ title, projects, locale, onOpen }: ProjectsCarouselP
         {title}
       </p>
 
-      <div className="relative">
-        <button
-          type="button"
-          onClick={() => slide("prev")}
-          className="absolute left-0 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
-          aria-label={locale === "pt" ? "Ver cards anteriores" : "View previous cards"}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </button>
+      <div className="relative pt-12 md:pt-0">
+        <div className="absolute right-1 top-0 z-20 flex items-center gap-2 md:inset-y-0 md:left-0 md:right-0 md:top-1/2 md:-translate-y-1/2 md:justify-between">
+          <button
+            type="button"
+            onClick={() => slide("prev")}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 md:h-10 md:w-10 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
+            aria-label={locale === "pt" ? "Ver cards anteriores" : "View previous cards"}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => slide("next")}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 md:h-10 md:w-10 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
+            aria-label={locale === "pt" ? "Ver proximos cards" : "View next cards"}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
 
         <div ref={trackRef} className="carousel-track">
           {projects.map((project) => (
@@ -103,14 +114,6 @@ function ProjectsCarousel({ title, projects, locale, onOpen }: ProjectsCarouselP
           ))}
         </div>
 
-        <button
-          type="button"
-          onClick={() => slide("next")}
-          className="absolute right-0 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
-          aria-label={locale === "pt" ? "Ver proximos cards" : "View next cards"}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
       </div>
     </div>
   );
@@ -300,7 +303,7 @@ export function PortfolioPage() {
             data-reveal
           >
             <Image
-              src="/avatar.JPG"
+              src="/avatar.jpg"
               alt="Lucas Limeira"
               loading="eager"
               width={400}

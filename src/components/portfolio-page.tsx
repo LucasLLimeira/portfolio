@@ -302,6 +302,7 @@ export function PortfolioPage() {
             <Image
               src="/avatar.JPG"
               alt="Lucas Limeira"
+              loading="eager"
               width={400}
               height={400}
               className="h-full w-full rounded-full object-cover object-[center_38%]"

@@ -16,9 +16,15 @@ type GithubRepo = {
   fork: boolean;
 };
 
-const GITHUB_API = "https://api.github.com/users/LucasLLimeira/repos";
-const GITHUB_PROFILE = "https://github.com/LucasLLimeira";
-const GITHUB_REPOSITORIES_TAB = "https://github.com/LucasLLimeira?tab=repositories";
+const GITHUB_USERNAME =
+  process.env.GITHUB_USERNAME || process.env.NEXT_PUBLIC_GITHUB_USERNAME || "LucasLLimeira";
+const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}/repos`;
+const GITHUB_PROFILE = `https://github.com/${GITHUB_USERNAME}`;
+const GITHUB_REPOSITORIES_TAB = `https://github.com/${GITHUB_USERNAME}?tab=repositories`;
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 function getGithubHeaders(): HeadersInit {
   const token = process.env.GITHUB_TOKEN || process.env.NEXT_PUBLIC_GITHUB_TOKEN;
@@ -61,7 +67,7 @@ function buildLanguageStats(languages: string[]): LanguageStat[] {
 
 function parseRepoNamesFromSection(html: string): string[] {
   const names: string[] = [];
-  const regex = /href="\/LucasLLimeira\/([^"\/?#]+)"/g;
+  const regex = new RegExp(`href="/${escapeRegExp(GITHUB_USERNAME)}/([^"/?#]+)"`, "g");
   let match: RegExpExecArray | null;
 
   while ((match = regex.exec(html)) !== null) {
@@ -89,8 +95,10 @@ function extractRecentNames(repositoriesHtml: string): string[] {
 
 function extractRepoPrimaryLanguages(repositoriesHtml: string): Map<string, string> {
   const map = new Map<string, string>();
-  const regex =
-    /href="\/LucasLLimeira\/([^"\/?#]+)"[\s\S]{0,2200}?itemprop="programmingLanguage"[^>]*>\s*([^<]+)\s*</g;
+  const regex = new RegExp(
+    `href="/${escapeRegExp(GITHUB_USERNAME)}/([^"/?#]+)"[\\s\\S]{0,2200}?itemprop="programmingLanguage"[^>]*>\\s*([^<]+)\\s*<`,
+    "g",
+  );
 
   let match: RegExpExecArray | null;
   while ((match = regex.exec(repositoriesHtml)) !== null) {
@@ -109,7 +117,7 @@ async function fetchRepoLanguageBreakdownByName(
 ): Promise<LanguageStat[]> {
   try {
     const response = await fetch(
-      `https://api.github.com/repos/LucasLLimeira/${encodeURIComponent(repoName)}/languages`,
+      `https://api.github.com/repos/${GITHUB_USERNAME}/${encodeURIComponent(repoName)}/languages`,
       {
         headers,
         cache: "no-store",
@@ -207,7 +215,7 @@ async function fetchHtmlGithubProjects(
           localMatch?.description ??
           (locale === "pt" ? "Projeto importado do GitHub." : "Project imported from GitHub."),
         tags: localMatch?.tags.length ? localMatch.tags : [],
-        githubUrl: `https://github.com/LucasLLimeira/${repoName}`,
+        githubUrl: `https://github.com/${GITHUB_USERNAME}/${repoName}`,
         demoUrl: localMatch?.demoUrl,
         image: localMatch?.image,
         previewVideo: localMatch?.previewVideo,

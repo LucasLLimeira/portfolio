@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
   );
 
   return {
-    metadataBase: new URL("https://lucas-limeira-portfolio.vercel.app"),
+    metadataBase: new URL("https://portfolio-xi-seven-jlsg130m3a.vercel.app/"),
     ...getMetadataByLocale(locale),
   };
 }

@@ -2,19 +2,19 @@ import type { ServiceItem } from "@/types/content";
 
 export const services: ServiceItem[] = [
   {
-    title: "Landing Pages",
-    description: "Páginas de alta conversão, rápidas e responsivas.",
+    title: "Aplicações React/Next.js Personalizadas",
+    description: "Aplicações web modernas e escaláveis com React e Next.js, construídas para performance e excelente experiência do usuário.",
   },
   {
-    title: "Front-end React/Next.js",
-    description: "Interfaces modernas, performáticas e escaláveis.",
+    title: "APIs e Backend com Node.js",
+    description: "Desenvolvimento de APIs REST seguras, com autenticação, validação de dados e arquitetura preparada para crescimento.",
   },
   {
-    title: "Integrações",
-    description: "Conexão com serviços externos, automações e fluxos.",
+    title: "Integrações e Automações",
+    description: "Integração com serviços de terceiros, webhooks e automações de fluxo para reduzir tarefas manuais e aumentar produtividade.",
   },
   {
-    title: "APIs básicas",
-    description: "Construção de endpoints simples para MVPs e produtos digitais.",
+    title: "Performance e SEO Técnico",
+    description: "Otimização de Core Web Vitals, carregamento e SEO técnico para melhorar velocidade, posicionamento e conversão.",
   },
 ];

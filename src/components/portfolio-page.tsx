@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Mail, MessageCircle } from "lucide-react";
 
 import { Badge } from "@/components/badge";
 import { Button } from "@/components/button";
+import { EducationModal } from "@/components/education-modal";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { ProjectCard } from "@/components/project-card";
@@ -16,13 +17,6 @@ import { getContent } from "@/lib/content";
 import { getLanguageColor } from "@/lib/language-colors";
 import type { LanguageStat, Project } from "@/types/content";
 import type { EducationItem, ServiceItem } from "@/types/content";
-
-const githubUsername = "LucasLLimeira";
-
-const whatsappMessage = encodeURIComponent(
-  "Olá Quero entrar em contato para um projeto/proposta",
-);
-const whatsappUrl = `https://wa.me/5583998760660?text=${whatsappMessage}`;
 
 function getProjectFilterTerms(project: Project) {
   const terms = new Set<string>();
@@ -62,10 +56,21 @@ type ProjectsCarouselProps = {
   title: string;
   projects: Project[];
   locale: "pt" | "en";
+  languagesLabel: string;
+  prevAriaLabel: string;
+  nextAriaLabel: string;
   onOpen: (project: Project) => void;
 };
 
-function ProjectsCarousel({ title, projects, locale, onOpen }: ProjectsCarouselProps) {
+function ProjectsCarousel({
+  title,
+  projects,
+  locale,
+  languagesLabel,
+  prevAriaLabel,
+  nextAriaLabel,
+  onOpen,
+}: ProjectsCarouselProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
 
   const slide = (direction: "prev" | "next") => {
@@ -86,12 +91,12 @@ function ProjectsCarousel({ title, projects, locale, onOpen }: ProjectsCarouselP
       </p>
 
       <div className="relative pt-12 md:pt-0">
-        <div className="absolute right-1 top-0 z-20 flex items-center gap-2 md:inset-y-0 md:left-0 md:right-0 md:top-1/2 md:-translate-y-1/2 md:justify-between">
+        <div className="pointer-events-none absolute right-1 top-0 z-20 flex items-center gap-2 md:left-0 md:right-0 md:top-1/2 md:-translate-y-1/2 md:justify-between">
           <button
             type="button"
             onClick={() => slide("prev")}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 md:h-10 md:w-10 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
-            aria-label={locale === "pt" ? "Ver cards anteriores" : "View previous cards"}
+            className="pointer-events-auto inline-flex h-9 w-9 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 md:h-10 md:w-10 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
+            aria-label={prevAriaLabel}
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -99,8 +104,8 @@ function ProjectsCarousel({ title, projects, locale, onOpen }: ProjectsCarouselP
           <button
             type="button"
             onClick={() => slide("next")}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 md:h-10 md:w-10 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
-            aria-label={locale === "pt" ? "Ver proximos cards" : "View next cards"}
+            className="pointer-events-auto inline-flex h-9 w-9 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 md:h-10 md:w-10 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
+            aria-label={nextAriaLabel}
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -109,7 +114,12 @@ function ProjectsCarousel({ title, projects, locale, onOpen }: ProjectsCarouselP
         <div ref={trackRef} className="carousel-track">
           {projects.map((project) => (
             <div key={project.slug} className="carousel-item">
-              <ProjectCard project={project} onOpen={onOpen} locale={locale} />
+              <ProjectCard
+                project={project}
+                onOpen={onOpen}
+                locale={locale}
+                languagesLabel={languagesLabel}
+              />
             </div>
           ))}
         </div>
@@ -122,10 +132,13 @@ function ProjectsCarousel({ title, projects, locale, onOpen }: ProjectsCarouselP
 export function PortfolioPage() {
   const { locale } = useLocale();
   const content = useMemo(() => getContent(locale), [locale]);
+  const whatsappMessage = encodeURIComponent(content.profile.links.whatsappMessage);
+  const whatsappUrl = `https://wa.me/${content.profile.links.whatsappNumber}?text=${whatsappMessage}`;
 
   const [projects, setProjects] = useState<Project[]>(content.projects);
   const [activeTag, setActiveTag] = useState<string>("all");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedEducation, setSelectedEducation] = useState<EducationItem | null>(null);
   const [remoteLoading, setRemoteLoading] = useState(true);
   const [usingFallback, setUsingFallback] = useState(false);
   const [languageStats, setLanguageStats] = useState<LanguageStat[]>([]);
@@ -255,7 +268,7 @@ export function PortfolioPage() {
               {content.profile.title}
             </span>
             <h1 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-slate-100">
-              {content.profile.hero.greeting} <br /> {content.profile.name}
+              {content.profile.hero.greeting} <br/>
             </h1>
             <p className="max-w-xl text-base leading-relaxed text-slate-700 sm:text-lg dark:text-slate-300">
               {content.profile.shortBio}
@@ -265,13 +278,13 @@ export function PortfolioPage() {
               <Button href="#contact" variant="ghost">
                 {content.profile.hero.ctaContact}
               </Button>
-              <Button href="/cv-lucas-limeira.pdf" variant="ghost" target="_blank" rel="noreferrer">
+              <Button href={content.profile.assets.cvHref} variant="ghost" target="_blank" rel="noreferrer">
                 {content.profile.hero.downloadCv}
               </Button>
             </div>
             <div className="flex flex-wrap gap-3 text-sm text-brand-700 dark:text-brand-200">
               <a
-                href={`https://github.com/${githubUsername}`}
+                href={`https://github.com/${content.profile.links.githubUsername}`}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-400 bg-white/90 text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-brand-100 hover:shadow-md dark:border-brand-400 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
                 target="_blank"
                 rel="noreferrer noopener"
@@ -280,7 +293,7 @@ export function PortfolioPage() {
                 <GithubMark />
               </a>
               <a
-                href="https://www.linkedin.com/in/lucas-de-lucena-limeira"
+                href={content.profile.links.linkedinUrl}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-400 bg-white/90 text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-brand-100 hover:shadow-md dark:border-brand-400 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
                 target="_blank"
                 rel="noreferrer noopener"
@@ -289,7 +302,7 @@ export function PortfolioPage() {
                 <LinkedinMark />
               </a>
               <a
-                href="mailto:lucasdllimeira@gmail.com"
+                href={`mailto:${content.profile.links.email}`}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-400 bg-white/90 text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-brand-100 hover:shadow-md dark:border-brand-400 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
                 aria-label="Email"
               >
@@ -304,7 +317,7 @@ export function PortfolioPage() {
           >
             <Image
               src="/avatar.jpg"
-              alt="Lucas Limeira"
+              alt={content.profile.assets.avatarAlt}
               loading="eager"
               width={400}
               height={400}
@@ -329,7 +342,7 @@ export function PortfolioPage() {
               {content.profile.about.highlights.map((item) => (
                 <span
                   key={item}
-                  className="rounded-full border border-brand-300/80 bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700 dark:border-brand-500/35 dark:bg-slate-800 dark:text-brand-200"
+                  className="rounded-full border border-brand-300/80 bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700 dark:border-brand-500/35 dark:bg-slate-800 dark:text-slate-100 hover:bg-slate-700/10"
                 >
                   {item}
                 </span>
@@ -344,12 +357,10 @@ export function PortfolioPage() {
           {languageStats.length > 0 ? (
             <article className="rounded-3xl border border-brand-200/80 bg-white/80 p-5 shadow-sm dark:border-brand-500/25 dark:bg-slate-900/70 md:p-7">
               <h3 className="text-sm font-bold uppercase tracking-[0.16em] text-brand-700 dark:text-brand-200">
-                {locale === "pt" ? "Linguagens mais usadas" : "Most used languages"}
+                {content.profile.projectsUi.mostUsedTitle}
               </h3>
               <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">
-                {locale === "pt"
-                  ? "Resumo das linguagens principais dos seus repositórios no GitHub."
-                  : "Summary of your top repository languages from GitHub."}
+                {content.profile.projectsUi.mostUsedSummary}
               </p>
               <div className="mt-6 grid items-center gap-6 md:grid-cols-[220px_1fr]">
                 <div className="mx-auto flex h-44 w-44 items-center justify-center rounded-full p-4" style={{ background: languageDonut }}>
@@ -417,17 +428,23 @@ export function PortfolioPage() {
 
           {pinnedProjects.length > 0 ? (
             <ProjectsCarousel
-              title={locale === "pt" ? "Pinned (Top 3)" : "Pinned (Top 3)"}
+              title={content.profile.projectsUi.pinnedTitle}
               projects={pinnedProjects}
               locale={locale}
+              languagesLabel={content.profile.projectsUi.languagesLabel}
+              prevAriaLabel={content.profile.projectsUi.carouselPrevAria}
+              nextAriaLabel={content.profile.projectsUi.carouselNextAria}
               onOpen={setSelectedProject}
             />
           ) : null}
 
           <ProjectsCarousel
-            title={locale === "pt" ? "Recentes" : "Recent"}
+            title={content.profile.projectsUi.recentTitle}
             projects={recentProjects}
             locale={locale}
+            languagesLabel={content.profile.projectsUi.languagesLabel}
+            prevAriaLabel={content.profile.projectsUi.carouselPrevAria}
+            nextAriaLabel={content.profile.projectsUi.carouselNextAria}
             onOpen={setSelectedProject}
           />
         </section>
@@ -451,14 +468,16 @@ export function PortfolioPage() {
           <SectionTitle title={content.profile.sections.education} />
           <div className="space-y-3">
             {content.education.map((item: EducationItem) => (
-              <article
+              <button
+                type="button"
                 key={item.title}
-                className="rounded-2xl border border-brand-200/80 bg-white/80 p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-brand-400 hover:shadow-2xl hover:shadow-brand-500/25 dark:border-brand-500/25 dark:bg-slate-900/70 dark:hover:border-brand-300/60 dark:hover:shadow-brand-500/20"
+                onClick={() => setSelectedEducation(item)}
+                className="w-full rounded-2xl border border-brand-200/80 bg-white/80 p-5 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:border-brand-400 hover:shadow-2xl hover:shadow-brand-500/25 dark:border-brand-500/25 dark:bg-slate-900/70 dark:hover:border-brand-300/60 dark:hover:shadow-brand-500/20"
               >
                 <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{item.title}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400">{item.institution}</p>
                 <p className="mt-1 text-sm font-medium text-brand-700 dark:text-brand-200">{item.status}</p>
-              </article>
+              </button>
             ))}
           </div>
         </section>
@@ -468,15 +487,13 @@ export function PortfolioPage() {
 
           <div className="rounded-3xl border border-brand-300/45 bg-linear-to-r from-slate-950/96 via-[#06153a]/94 to-[#07233f]/92 p-7 shadow-xl shadow-brand-500/10 md:p-10 dark:border-brand-500/35">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-200/90">
-              {locale === "pt" ? "Contato Direto" : "Direct Contact"}
+              {content.profile.contactCard.kicker}
             </p>
             <h3 className="mt-3 text-3xl font-bold text-white md:text-4xl">
-              {locale === "pt" ? "Vamos construir algo grande?" : "Shall we build something big?"}
+              {content.profile.contactCard.title}
             </h3>
             <p className="mt-4 max-w-3xl text-base leading-relaxed text-slate-200/90">
-              {locale === "pt"
-                ? "Se voce tem uma ideia, produto ou evolucao tecnica em mente, podemos desenhar a melhor forma de construir juntos."
-                : "If you have an idea, product, or technical upgrade in mind, we can map the best way to build it together."}
+              {content.profile.contactText}
             </p>
 
             <div className="mt-7 flex flex-wrap items-center gap-3">
@@ -487,19 +504,17 @@ export function PortfolioPage() {
                 className="gap-2 px-5 py-2.5 text-sm"
               >
                 <MessageCircle className="h-4 w-4" />
-                {locale === "pt" ? "Enviar mensagem" : "Send message"}
+                {content.profile.contactCard.whatsappCta}
               </Button>
               <Button
-                href="mailto:lucasdllimeira@gmail.com"
+                href={`mailto:${content.profile.links.email}`}
                 variant="ghost"
                 className="border-brand-300/40 bg-transparent px-4 py-2 text-xs text-slate-100 hover:bg-white/10 dark:border-brand-300/35"
               >
                 Email
               </Button>
               <span className="text-sm text-slate-300/85">
-                {locale === "pt"
-                  ? "Disponivel para novos projetos e colaboracoes"
-                  : "Available for new projects and collaborations"}
+                {content.profile.contactCard.availability}
               </span>
             </div>
           </div>
@@ -511,10 +526,19 @@ export function PortfolioPage() {
       <ProjectModal
         project={selectedProject}
         onClose={() => setSelectedProject(null)}
-        locale={locale}
         viewDemoLabel={content.profile.projectsUi.viewDemo}
         viewRepoLabel={content.profile.projectsUi.viewRepo}
         noDemoLabel={content.profile.projectsUi.noDemo}
+        previewLabel={content.profile.projectModalUi.previewLabel}
+        closeAriaLabel={content.profile.projectModalUi.closeAria}
+        iframeFallbackLabel={content.profile.projectModalUi.iframeFallback}
+        repoPreviewCaption={content.profile.projectModalUi.repoPreviewCaption}
+      />
+
+      <EducationModal
+        education={selectedEducation}
+        onClose={() => setSelectedEducation(null)}
+        locale={locale}
       />
     </>
   );

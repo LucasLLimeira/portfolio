@@ -98,7 +98,7 @@ export function Header() {
       <div className="mx-auto w-full max-w-6xl">
         <div className="flex items-center justify-between gap-2 rounded-full border border-brand-200/60 bg-white/80 px-4 py-3 shadow-lg shadow-brand-500/10 backdrop-blur-md dark:border-brand-500/25 dark:bg-slate-950/70">
         <a href="#home" className="text-sm font-black tracking-wide text-slate-950 dark:text-white">
-          Lucas Limeira
+          {content.profile.name}
         </a>
 
         <nav className="hidden items-center gap-1 md:flex">
@@ -123,7 +123,7 @@ export function Header() {
             type="button"
             onClick={toggleLocale}
             className="rounded-full border border-brand-300 bg-white/90 px-3 py-1.5 text-xs font-semibold text-slate-900 transition hover:bg-brand-100 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
-            aria-label="toggle language"
+            aria-label={content.profile.header.localeToggleAria}
           >
             {locale === "pt" ? "PT" : "EN"}
           </button>

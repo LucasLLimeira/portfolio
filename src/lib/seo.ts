@@ -26,20 +26,11 @@ export function getMetadataByLocale(locale: Locale): Metadata {
       description: seo.description,
       type: "website",
       siteName: "Lucas Limeira Portfolio",
-      images: [
-        {
-          url: "/og-image.png",
-          width: 1200,
-          height: 630,
-          alt: "Lucas Limeira Portfolio",
-        },
-      ],
     },
     twitter: {
       card: "summary_large_image",
       title: seo.title,
       description: seo.description,
-      images: ["/og-image.png"],
     },
   };
 }

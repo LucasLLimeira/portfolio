@@ -4,7 +4,18 @@ export const profile: ProfileContent = {
   name: "Lucas Limeira",
   title: "FullStack Developer",
   shortBio:
-    "I build modern interfaces and scalable web applications focused on performance, user experience, and clean code.",
+    "Early-career Full Stack developer creating complete web applications with React and Node.js, focusing on performance, usability, and best practices.",
+  links: {
+    githubUsername: "LucasLLimeira",
+    linkedinUrl: "https://www.linkedin.com/in/lucas-de-lucena-limeira",
+    email: "lucasdllimeira@gmail.com",
+    whatsappNumber: "5583998760660",
+    whatsappMessage: "Hello, I would like to talk about a project/proposal",
+  },
+  assets: {
+    cvHref: "/cv-lucas-limeira.pdf",
+    avatarAlt: "Lucas Limeira",
+  },
   metadata: {
     title: "Lucas Limeira | FullStack Developer",
     description:
@@ -18,8 +29,11 @@ export const profile: ProfileContent = {
     education: "Education",
     contact: "Contact",
   },
+  header: {
+    localeToggleAria: "toggle language",
+  },
   hero: {
-    greeting: "Hi, I'm Lucas.",
+    greeting: "Hi, I'm Lucas, Full Stack Developer.",
     ctaProjects: "View projects",
     ctaContact: "Contact",
     downloadCv: "Download CV",
@@ -35,13 +49,13 @@ export const profile: ProfileContent = {
     kicker: "About me",
     title: "My journey",
     description:
-      "I started by building practical projects to strengthen my front-end foundation and gradually evolved into fullstack application development focused on real delivery. Today, I combine user experience, performance, and clean code structure to turn ideas into useful and well-crafted products.",
+      "I am a Full Stack Developer with a background in Civil Engineering, which gave me a solid foundation in logical reasoning, problem analysis, and process organization. I began my tech career developing practical projects to establish front-end fundamentals, evolving into building complete full stack applications.\n\nCurrently, I develop solutions using React on the frontend and Node.js, with a focus on API integration, best practices, and performance. I strive to create efficient, well-structured applications while maintaining continuous learning and growth as core values.",
     highlights: [
       "Next.js",
       "React",
       "TypeScript",
       "Node.js",
-      "Tailwind CSS",
+      "REST APIs",
     ],
   },
   projectsUi: {
@@ -50,12 +64,33 @@ export const profile: ProfileContent = {
     viewRepo: "View repository",
     viewDemo: "View demo",
     noDemo: "No demo available",
+    languagesLabel: "Languages",
+    mostUsedTitle: "Most used languages",
+    mostUsedSummary: "Summary of your top repository languages from GitHub.",
+    pinnedTitle: "Pinned (Top 3)",
+    recentTitle: "Recent",
+    carouselPrevAria: "View previous cards",
+    carouselNextAria: "View next cards",
     loadingRemote: "Syncing featured projects from GitHub...",
     showingFallback: "Showing local projects (fallback).",
   },
+  contactCard: {
+    kicker: "Direct Contact",
+    title: "Shall we build something big?",
+    whatsappCta: "Send message",
+    availability: "Available for new projects and collaborations",
+  },
+  projectModalUi: {
+    previewLabel: "Preview",
+    closeAria: "close modal",
+    iframeFallback:
+      "Some pages may block embedded preview. Use the button below to open it directly.",
+    repoPreviewCaption: "Preview generated from repository card. Click to open on GitHub.",
+    localPreviewCaption: "Local preview loaded from repository (public/previews folder).",
+  },
   servicesIntro:
-    "Practical solutions to launch digital products quickly with quality.",
+    "Complete web application development, from frontend to backend, with a focus on performance and quality.",
   contactText:
-    "Let's talk about your next product, technical improvements, or partnership opportunities.",
-  footerText: "Built by Lucas Limeira.",
+    "Ready to collaborate on new projects and partnerships, with focus on quality, performance, and clean architecture.",
+  footerRights: "All rights reserved.",
 };

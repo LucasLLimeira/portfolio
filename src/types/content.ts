@@ -6,6 +6,17 @@ export type ProfileContent = {
   name: string;
   title: string;
   shortBio: string;
+  links: {
+    githubUsername: string;
+    linkedinUrl: string;
+    email: string;
+    whatsappNumber: string;
+    whatsappMessage: string;
+  };
+  assets: {
+    cvHref: string;
+    avatarAlt: string;
+  };
   metadata: {
     title: string;
     description: string;
@@ -17,6 +28,9 @@ export type ProfileContent = {
     services: string;
     education: string;
     contact: string;
+  };
+  header: {
+    localeToggleAria: string;
   };
   hero: {
     greeting: string;
@@ -43,12 +57,32 @@ export type ProfileContent = {
     viewRepo: string;
     viewDemo: string;
     noDemo: string;
+    languagesLabel: string;
+    mostUsedTitle: string;
+    mostUsedSummary: string;
+    pinnedTitle: string;
+    recentTitle: string;
+    carouselPrevAria: string;
+    carouselNextAria: string;
     loadingRemote: string;
     showingFallback: string;
   };
+  contactCard: {
+    kicker: string;
+    title: string;
+    whatsappCta: string;
+    availability: string;
+  };
+  projectModalUi: {
+    previewLabel: string;
+    closeAria: string;
+    iframeFallback: string;
+    repoPreviewCaption: string;
+    localPreviewCaption: string;
+  };
   servicesIntro: string;
   contactText: string;
-  footerText: string;
+  footerRights: string;
 };
 
 export type Project = {
@@ -80,8 +114,13 @@ export type ServiceItem = {
 };
 
 export type EducationItem = {
+  slug?: string;
   title: string;
+  description?: string;
   institution: string;
   status: string;
   period?: string;
+  certificateUrl?: string;
+  image?: string;
+  previewVideo?: string;
 };

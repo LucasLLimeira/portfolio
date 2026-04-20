@@ -1,12 +1,18 @@
 # Lucas Limeira - Portfolio
 
-Portfolio pessoal com Next.js App Router + TypeScript + Tailwind CSS (v4), com i18n real sem rotas separadas (`/pt` e `/en`), tema claro/escuro, modal de projetos e SEO bilíngue.
+Portfolio pessoal com Next.js App Router + TypeScript + Tailwind CSS (v4), com i18n real sem rotas separadas (`/pt` e `/en`), modo escuro, modal de projetos e SEO bilíngue.
+
+## Site Publicado
+
+- Produção (Vercel): https://SEU-PROJETO.vercel.app
 
 ## Stack
 
 - Next.js 16 (App Router)
 - TypeScript
 - Tailwind CSS 4
+- Vitest
+- GitHub Actions
 
 ## Instalação
 
@@ -22,22 +28,64 @@ npm run dev
 
 Abra http://localhost:3000.
 
-## Build de produção
+## Validação local (mesmas etapas do CI)
+
+```bash
+npm run lint
+npm run test
+npm run build
+```
+
+## CI/CD com GitHub Actions
+
+Workflow único em `.github/workflows/main.yml`.
+
+Gatilhos:
+- Push para `main`
+- Pull Request para `main`
+
+Etapas de CI:
+- `npm ci`
+- `npm run lint`
+- `npm run test`
+- `npm run build`
+
+Etapa de CD:
+- Deploy automático na Vercel após CI aprovado em push para `main`.
+
+## Passo a passo no GitHub
+
+1. Faça push do projeto para o GitHub.
+2. No repositório, acesse `Settings` > `Secrets and variables` > `Actions`.
+3. Crie os secrets:
+	- `VERCEL_TOKEN`
+	- `VERCEL_ORG_ID`
+	- `VERCEL_PROJECT_ID`
+4. Abra um PR para `main` e confira a aba `Actions`:
+	- job de CI precisa passar com lint, test e build.
+5. Faça merge na `main`.
+6. Confira novamente a aba `Actions`:
+	- job de deploy para Vercel deve rodar automaticamente.
+
+## Passo a passo no Vercel
+
+1. Acesse https://vercel.com/new e importe este repositório.
+2. Confirme `Framework Preset` como `Next.js`.
+3. Confirme `Production Branch` como `main`.
+4. Em `Account Settings`, gere um token de API (usar no secret `VERCEL_TOKEN`).
+5. Em `Project Settings`, copie o `Project ID` (usar no `VERCEL_PROJECT_ID`).
+6. Em `Team/Account Settings`, copie o `Org ID` (usar no `VERCEL_ORG_ID`).
+7. Após merge na `main`, valide o deploy em `Deployments`.
+8. Copie a URL de produção e substitua em `Site Publicado` neste README.
+
+## Deploy manual na Vercel (opcional)
 
 ```bash
 npm run build
-npm run start
+vercel pull --yes --environment=production
+vercel build --prod
+vercel deploy --prebuilt --prod
 ```
-
-## Deploy na Vercel (passo a passo)
-
-1. Faça push do repositório para GitHub.
-2. Acesse https://vercel.com/new e faça login.
-3. Importe o repositório `portfolio`.
-4. Framework Preset: `Next.js`.
-5. Não é obrigatório adicionar variáveis de ambiente para o MVP.
-6. Clique em `Deploy`.
-7. Após o deploy, acesse a URL gerada e valide idioma, tema e links de contato.
 
 ## i18n sem rotas
 
@@ -45,15 +93,15 @@ npm run start
 - Persistência em `localStorage` e cookie (`locale`).
 - Primeiro acesso usa idioma do navegador com fallback para PT.
 
-## Bônus GitHub API
+## Integração com GitHub API
 
 - A seção de projetos tenta buscar repositórios públicos de `LucasLLimeira`.
 - Filtra por nomes definidos em `featuredRepoNames`.
 - Em caso de falha/rate limit, usa automaticamente os projetos locais.
 
-Token opcional (não obrigatório):
+Token opcional:
 
-- Você pode definir `NEXT_PUBLIC_GITHUB_TOKEN` para aumentar limite de requisições.
+- Você pode definir `GITHUB_TOKEN` em `.env.local` para aumentar limite de requisições no backend.
 - Não commite token no repositório.
 
 ## Arquivos para manutenção de conteúdo

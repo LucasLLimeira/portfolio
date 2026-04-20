@@ -4,3 +4,6 @@
 - Tailwind CSS: /tailwindlabs/tailwindcss.com
 - tsParticles: /tsparticles/tsparticles
 - Lucide: /lucide-icons/lucide
+- GitHub Actions: /websites/github_en_actions
+- Vercel Docs: /websites/vercel
+- Vitest: /vitest-dev/vitest

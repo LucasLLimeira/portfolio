@@ -47,7 +47,7 @@ export function ProjectCard({ project, onOpen, locale, languagesLabel }: Project
     <button
       type="button"
       onClick={() => onOpen(project)}
-      className="group relative my-1 flex h-97.5 w-full flex-col rounded-2xl border border-brand-200/80 bg-white/80 p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-brand-400 hover:shadow-xl hover:shadow-brand-500/18 hover:z-10 dark:border-brand-500/30 dark:bg-slate-900/70 dark:hover:border-brand-300/60 dark:hover:shadow-brand-500/16"
+      className="group relative my-1 flex h-100 w-full flex-col rounded-2xl border border-brand-200/80 bg-white/80 p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-brand-400 hover:shadow-xl hover:shadow-brand-500/18 hover:z-10 dark:border-brand-500/30 dark:bg-slate-900/70 dark:hover:border-brand-300/60 dark:hover:shadow-brand-500/16"
     >
       <div className="flex h-full flex-col">
         <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{project.title}</h3>

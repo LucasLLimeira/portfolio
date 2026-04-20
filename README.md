@@ -4,7 +4,7 @@ Portfolio pessoal com Next.js App Router + TypeScript + Tailwind CSS (v4), com i
 
 ## Site Publicado
 
-- Produção (Vercel): https://SEU-PROJETO.vercel.app
+- Produção (Vercel): https://portfolio-7upbse6yu-lucasllimeiras-projects.vercel.app/
 
 ## Stack
 

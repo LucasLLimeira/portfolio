@@ -36,7 +36,13 @@ export const profile: ProfileContent = {
     greeting: "Olá, eu sou Lucas, Desenvolvedor Full Stack.",
     ctaProjects: "Ver projetos",
     ctaContact: "Contato",
-    downloadCv: "Baixar CV",
+    downloadCv: "Currículo",
+  },
+  cvModal: {
+    title: "Currículo",
+    closeAria: "fechar modal de currículo",
+    previewFallback: "Não foi possível carregar a pré-visualização do PDF neste navegador.",
+    downloadCta: "Baixar currículo",
   },
   sections: {
     about: "Sobre",

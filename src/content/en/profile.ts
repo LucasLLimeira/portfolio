@@ -36,7 +36,13 @@ export const profile: ProfileContent = {
     greeting: "Hi, I'm Lucas, Full Stack Developer.",
     ctaProjects: "View projects",
     ctaContact: "Contact",
-    downloadCv: "Download CV",
+    downloadCv: "Resume",
+  },
+  cvModal: {
+    title: "Resume",
+    closeAria: "close resume modal",
+    previewFallback: "Unable to load PDF preview in this browser.",
+    downloadCta: "Download resume",
   },
   sections: {
     about: "About",
@@ -49,7 +55,7 @@ export const profile: ProfileContent = {
     kicker: "About me",
     title: "My journey",
     description:
-      "I am a Full Stack Developer with a background in Civil Engineering, which gave me a solid foundation in logical reasoning, problem analysis, and process organization. I began my tech career developing practical projects to establish front-end fundamentals, evolving into building complete full stack applications.\n\nCurrently, I develop solutions using React on the frontend and Node.js, with a focus on API integration, best practices, and performance. I strive to create efficient, well-structured applications while maintaining continuous learning and growth as core values.",
+      "I am a Full Stack Developer with a background in Civil Engineering, which gave me a solid foundation in logical reasoning, problem analysis, and process organization. I began my tech career developing practical projects to establish front-end fundamentals, evolving into building complete full stack applications.\n\nCurrently, I develop solutions using React on the frontend and Node.js, with a focus on API integration, best practices, and performance. I strive to create efficient, well-structured applications while maintaining continuous learning and growth as part of my process.",
     highlights: [
       "Next.js",
       "React",
@@ -76,7 +82,7 @@ export const profile: ProfileContent = {
   },
   contactCard: {
     kicker: "Direct Contact",
-    title: "Shall we build something big?",
+    title: "Let's build something big?",
     whatsappCta: "Send message",
     availability: "Available for new projects and collaborations",
   },
@@ -85,12 +91,12 @@ export const profile: ProfileContent = {
     closeAria: "close modal",
     iframeFallback:
       "Some pages may block embedded preview. Use the button below to open it directly.",
-    repoPreviewCaption: "Preview generated from repository card. Click to open on GitHub.",
+    repoPreviewCaption: "Preview generated from the repository. Click to open on GitHub.",
     localPreviewCaption: "Local preview loaded from repository (public/previews folder).",
   },
   servicesIntro:
     "Complete web application development, from frontend to backend, with a focus on performance and quality.",
   contactText:
-    "Ready to collaborate on new projects and partnerships, with focus on quality, performance, and clean architecture.",
+    "Ready to collaborate on new projects and partnerships, with focus on quality, performance, and clean code.",
   footerRights: "All rights reserved.",
 };

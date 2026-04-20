@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/button";
 import type { Project } from "@/types/content";
@@ -40,6 +40,7 @@ export function ProjectModal({
   iframeFallbackLabel,
   repoPreviewCaption,
 }: ProjectModalProps) {
+  const [iframeFailedFor, setIframeFailedFor] = useState<string | null>(null);
 
   useEffect(() => {
     if (!project) return;
@@ -53,6 +54,10 @@ export function ProjectModal({
   }, [project, onClose]);
 
   if (!project) return null;
+
+  const projectPreviewKey = `${project.slug}:${project.demoUrl ?? "no-demo"}`;
+  const iframeFailed = iframeFailedFor === projectPreviewKey;
+  const shouldShowDemoPreview = Boolean(project.demoUrl) && !iframeFailed;
 
   const repoPath = getRepoPath(project.githubUrl);
   const repoPreviewUrl = repoPath
@@ -88,7 +93,7 @@ export function ProjectModal({
             {project.description}
           </p>
 
-          {project.demoUrl ? (
+          {shouldShowDemoPreview ? (
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-300">
                 {previewLabel}
@@ -101,6 +106,7 @@ export function ProjectModal({
                     className="h-full w-full border-0"
                     loading="lazy"
                     referrerPolicy="strict-origin-when-cross-origin"
+                    onError={() => setIframeFailedFor(projectPreviewKey)}
                   />
                 </div>
               </div>
@@ -151,7 +157,7 @@ export function ProjectModal({
           </div>
 
           <div className="flex flex-wrap gap-3 pt-2">
-            {project.demoUrl ? (
+            {shouldShowDemoPreview ? (
               <Button
                 href={project.demoUrl}
                 target="_blank"

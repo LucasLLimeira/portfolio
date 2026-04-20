@@ -1,6 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
+import { cookies, headers } from "next/headers";
 import { ImageResponse } from "next/og";
+
+import { DEFAULT_LOCALE, detectLocaleFromHeader, isLocale, LOCALE_COOKIE } from "@/lib/locale";
+import type { Locale } from "@/types/content";
 
 export const alt = "Lucas Limeira | FullStack Developer";
 
@@ -10,6 +14,26 @@ export const size = {
 };
 
 export const contentType = "image/png";
+
+const ogContentByLocale: Record<Locale, { badge: string; line1: string; line2: string; stack: string }> = {
+  pt: {
+    badge: "Desenvolvedor FullStack",
+    line1: "Olá, eu sou Lucas,",
+    line2: "Desenvolvedor Full Stack.",
+    stack: "React · Node.js · TypeScript · APIs REST",
+  },
+  en: {
+    badge: "FullStack Developer",
+    line1: "Hi, I'm Lucas,",
+    line2: "Full Stack Developer.",
+    stack: "React · Node.js · TypeScript · REST APIs",
+  },
+};
+
+function resolveLocaleFromRequest(cookieValue: string | undefined, acceptLanguage: string | null): Locale {
+  if (isLocale(cookieValue)) return cookieValue;
+  return detectLocaleFromHeader(acceptLanguage) ?? DEFAULT_LOCALE;
+}
 
 function getJpegOrientation(buffer: Buffer): number {
   if (buffer.length < 4 || buffer.readUInt16BE(0) !== 0xffd8) return 1;
@@ -79,7 +103,17 @@ function orientationToTransform(orientation: number): string {
   }
 }
 
-export default function Image() {
+export default async function Image() {
+  const cookieStore = await cookies();
+  const headersStore = await headers();
+  const locale = resolveLocaleFromRequest(
+    cookieStore.get(LOCALE_COOKIE)?.value,
+    headersStore.get("accept-language"),
+  );
+
+  const copy = ogContentByLocale[locale];
+  const host = headersStore.get("host") ?? "portfolio-xi-seven-jlsg130m3a.vercel.app";
+
   const avatarPath = path.join(process.cwd(), "public", "avatar.jpg");
   const avatarBuffer = fs.readFileSync(avatarPath);
   const orientation = getJpegOrientation(avatarBuffer);
@@ -147,7 +181,7 @@ export default function Image() {
                 color: "#93c5fd",
               }}
             >
-              Desenvolvedor FullStack
+              {copy.badge}
             </span>
           </div>
 
@@ -162,7 +196,7 @@ export default function Image() {
               marginBottom: 20,
             }}
           >
-            Olá, eu sou Lucas,
+            {copy.line1}
           </div>
           <div
             style={{
@@ -174,7 +208,7 @@ export default function Image() {
               marginBottom: 28,
             }}
           >
-            Desenvolvedor Full Stack.
+            {copy.line2}
           </div>
 
           {/* Divider */}
@@ -197,7 +231,7 @@ export default function Image() {
               maxWidth: 620,
             }}
           >
-            React · Node.js · TypeScript · APIs REST
+            {copy.stack}
           </div>
 
           {/* Domain */}
@@ -209,7 +243,7 @@ export default function Image() {
               letterSpacing: "0.04em",
             }}
           >
-            portfolio-xi-seven-jlsg130m3a.vercel.app
+            {host}
           </div>
         </div>
 

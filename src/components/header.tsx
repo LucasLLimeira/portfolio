@@ -97,9 +97,14 @@ export function Header() {
     <header data-app-nav="true" className="sticky top-3 z-40 px-4 md:px-6">
       <div className="mx-auto w-full max-w-6xl">
         <div className="flex items-center justify-between gap-2 rounded-full border border-brand-200/60 bg-white/80 px-4 py-3 shadow-lg shadow-brand-500/10 backdrop-blur-md dark:border-brand-500/25 dark:bg-slate-950/70">
-        <a href="#home" className="text-sm font-black tracking-wide text-slate-950 dark:text-white">
-          {content.profile.name}
-        </a>
+          <a
+            href="#home"
+            className="group inline-flex items-center rounded-full px-2 py-1 text-sm font-black tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-brand-300/70 dark:focus-visible:ring-offset-slate-950"
+          >
+            <span className="bg-linear-to-r from-brand-600 via-brand-500 to-brand-400 bg-clip-text text-transparent drop-shadow-[0_1px_1px_rgba(14,26,46,0.16)] transition group-hover:from-brand-500 group-hover:via-brand-400 group-hover:to-brand-300 dark:from-brand-300 dark:via-brand-200 dark:to-brand-400 dark:drop-shadow-[0_1px_1px_rgba(7,23,58,0.45)] dark:group-hover:from-brand-200 dark:group-hover:via-brand-100 dark:group-hover:to-brand-300">
+              {content.profile.name}
+            </span>
+          </a>
 
         <nav className="hidden items-center gap-1 md:flex">
           {sectionOrder.map((section) => (

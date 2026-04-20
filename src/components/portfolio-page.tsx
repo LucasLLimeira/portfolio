@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Mail, MessageCircle } from "lucide-react";
 
 import { Badge } from "@/components/badge";
 import { Button } from "@/components/button";
+import { CvModal } from "@/components/cv-modal";
 import { EducationModal } from "@/components/education-modal";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
@@ -139,6 +140,7 @@ export function PortfolioPage() {
   const [activeTag, setActiveTag] = useState<string>("all");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [selectedEducation, setSelectedEducation] = useState<EducationItem | null>(null);
+  const [isCvModalOpen, setIsCvModalOpen] = useState(false);
   const [remoteLoading, setRemoteLoading] = useState(true);
   const [usingFallback, setUsingFallback] = useState(false);
   const [languageStats, setLanguageStats] = useState<LanguageStat[]>([]);
@@ -278,7 +280,7 @@ export function PortfolioPage() {
               <Button href="#contact" variant="ghost">
                 {content.profile.hero.ctaContact}
               </Button>
-              <Button href={content.profile.assets.cvHref} variant="ghost" target="_blank" rel="noreferrer">
+              <Button variant="ghost" onClick={() => setIsCvModalOpen(true)}>
                 {content.profile.hero.downloadCv}
               </Button>
             </div>
@@ -539,6 +541,16 @@ export function PortfolioPage() {
         education={selectedEducation}
         onClose={() => setSelectedEducation(null)}
         locale={locale}
+      />
+
+      <CvModal
+        isOpen={isCvModalOpen}
+        cvHref={content.profile.assets.cvHref}
+        title={content.profile.cvModal.title}
+        closeAria={content.profile.cvModal.closeAria}
+        previewFallback={content.profile.cvModal.previewFallback}
+        downloadCta={content.profile.cvModal.downloadCta}
+        onClose={() => setIsCvModalOpen(false)}
       />
     </>
   );

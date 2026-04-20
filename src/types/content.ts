@@ -38,6 +38,12 @@ export type ProfileContent = {
     ctaContact: string;
     downloadCv: string;
   };
+  cvModal: {
+    title: string;
+    closeAria: string;
+    previewFallback: string;
+    downloadCta: string;
+  };
   sections: {
     about: string;
     projects: string;

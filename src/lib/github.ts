@@ -111,6 +111,58 @@ function extractRepoPrimaryLanguages(repositoriesHtml: string): Map<string, stri
   return map;
 }
 
+function normalizeDemoUrl(value?: string | null): string | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) return undefined;
+
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
+function blocksIframeEmbedding(response: Response): boolean {
+  const xFrameOptions = response.headers.get("x-frame-options")?.toLowerCase() ?? "";
+  if (xFrameOptions.includes("deny") || xFrameOptions.includes("sameorigin")) {
+    return true;
+  }
+
+  const csp = response.headers.get("content-security-policy")?.toLowerCase() ?? "";
+  if (!csp.includes("frame-ancestors")) return false;
+
+  return csp.includes("frame-ancestors 'none'") || csp.includes("frame-ancestors 'self'");
+}
+
+async function canUseDemoPreview(url: string): Promise<boolean> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+
+  try {
+    const attempt = async (method: "HEAD" | "GET") =>
+      fetch(url, {
+        method,
+        redirect: "follow",
+        cache: "no-store",
+        signal: controller.signal,
+        headers: {
+          "User-Agent": "portfolio-app",
+        },
+      });
+
+    let response = await attempt("HEAD");
+    if (response.status === 405 || response.status === 501) {
+      response = await attempt("GET");
+    }
+
+    if (!response.ok) return false;
+    if (blocksIframeEmbedding(response)) return false;
+
+    return true;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function fetchRepoLanguageBreakdownByName(
   repoName: string,
   headers: HeadersInit,
@@ -207,6 +259,11 @@ async function fetchHtmlGithubProjects(
 
       const primaryLanguage = languagesBreakdown[0]?.language;
       const primaryPercent = languagesBreakdown[0]?.percent;
+      const candidateDemoUrl = normalizeDemoUrl(localMatch?.demoUrl);
+      const demoUrl =
+        candidateDemoUrl && (await canUseDemoPreview(candidateDemoUrl))
+          ? candidateDemoUrl
+          : undefined;
 
       return {
         slug: repoName,
@@ -216,7 +273,7 @@ async function fetchHtmlGithubProjects(
           (locale === "pt" ? "Projeto importado do GitHub." : "Project imported from GitHub."),
         tags: localMatch?.tags.length ? localMatch.tags : [],
         githubUrl: `https://github.com/${GITHUB_USERNAME}/${repoName}`,
-        demoUrl: localMatch?.demoUrl,
+        demoUrl,
         image: localMatch?.image,
         previewVideo: localMatch?.previewVideo,
         language: primaryLanguage,
@@ -362,6 +419,11 @@ export async function fetchFeaturedGithubProjects(
 
       const primaryLanguage = languagesBreakdown[0]?.language ?? repo.language ?? undefined;
       const primaryPercent = languagesBreakdown[0]?.percent;
+      const candidateDemoUrl = normalizeDemoUrl(localMatch?.demoUrl ?? repo.homepage ?? undefined);
+      const demoUrl =
+        candidateDemoUrl && (await canUseDemoPreview(candidateDemoUrl))
+          ? candidateDemoUrl
+          : undefined;
 
       return {
         slug: repo.name,
@@ -379,7 +441,7 @@ export async function fetchFeaturedGithubProjects(
               ? repo.topics.filter((topic) => topic.toLowerCase() !== "github").slice(0, 4)
               : [],
         githubUrl: repo.html_url,
-        demoUrl: localMatch?.demoUrl ?? repo.homepage ?? undefined,
+        demoUrl,
         image: localMatch?.image,
         previewVideo: localMatch?.previewVideo,
         language: primaryLanguage,

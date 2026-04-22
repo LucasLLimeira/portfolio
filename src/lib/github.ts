@@ -419,7 +419,7 @@ export async function fetchFeaturedGithubProjects(
 
       const primaryLanguage = languagesBreakdown[0]?.language ?? repo.language ?? undefined;
       const primaryPercent = languagesBreakdown[0]?.percent;
-      const candidateDemoUrl = normalizeDemoUrl(localMatch?.demoUrl ?? repo.homepage ?? undefined);
+      const candidateDemoUrl = normalizeDemoUrl(localMatch?.demoUrl || repo.homepage || undefined);
       const demoUrl =
         candidateDemoUrl && (await canUseDemoPreview(candidateDemoUrl))
           ? candidateDemoUrl

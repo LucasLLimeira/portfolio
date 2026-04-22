@@ -14,6 +14,27 @@ type CvModalProps = {
   onClose: () => void;
 };
 
+function CvPreview({ cvHref, title, previewFallback }: Pick<CvModalProps, "cvHref" | "title" | "previewFallback">) {
+  const [previewFailed, setPreviewFailed] = useState(false);
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-brand-200/80 bg-slate-100 dark:border-brand-500/30 dark:bg-slate-950">
+      {!previewFailed ? (
+        <iframe
+          src={cvHref}
+          title={title}
+          className="h-[62vh] w-full"
+          onError={() => setPreviewFailed(true)}
+        />
+      ) : (
+        <div className="flex h-[42vh] items-center justify-center px-6 text-center text-sm text-slate-500 dark:text-slate-400">
+          {previewFallback}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function CvModal({
   isOpen,
   cvHref,
@@ -23,8 +44,6 @@ export function CvModal({
   downloadCta,
   onClose,
 }: CvModalProps) {
-  const [previewFailed, setPreviewFailed] = useState(false);
-
   useEffect(() => {
     if (!isOpen) return;
 
@@ -35,12 +54,6 @@ export function CvModal({
     window.addEventListener("keydown", onEsc);
     return () => window.removeEventListener("keydown", onEsc);
   }, [isOpen, onClose]);
-
-  useEffect(() => {
-    if (isOpen) {
-      setPreviewFailed(false);
-    }
-  }, [isOpen, cvHref]);
 
   if (!isOpen) return null;
 
@@ -68,21 +81,7 @@ export function CvModal({
               x
             </button>
           </div>
-
-          <div className="overflow-hidden rounded-xl border border-brand-200/80 bg-slate-100 dark:border-brand-500/30 dark:bg-slate-950">
-            {!previewFailed ? (
-              <iframe
-                src={cvHref}
-                title={title}
-                className="h-[62vh] w-full"
-                onError={() => setPreviewFailed(true)}
-              />
-            ) : (
-              <div className="flex h-[42vh] items-center justify-center px-6 text-center text-sm text-slate-500 dark:text-slate-400">
-                {previewFallback}
-              </div>
-            )}
-          </div>
+          <CvPreview key={cvHref} cvHref={cvHref} title={title} previewFallback={previewFallback} />
 
           <div className="pt-1">
             <Button href={cvHref} target="_blank" rel="noreferrer" variant="ghost">

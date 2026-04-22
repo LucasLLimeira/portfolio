@@ -1,7 +1,12 @@
+import * as React from "react";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ProjectModal } from "./project-modal";
+
+vi.mock("next/image", () => ({
+  default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => React.createElement("img", { ...props, alt: props.alt ?? "" }),
+}));
 
 vi.mock("@/components/button", () => ({
   Button: ({ children, href, onClick }: { children: React.ReactNode; href?: string; onClick?: () => void }) =>

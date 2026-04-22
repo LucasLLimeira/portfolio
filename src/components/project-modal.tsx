@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/button";
@@ -125,9 +126,12 @@ export function ProjectModal({
                 rel="noreferrer noopener"
                 className="block overflow-hidden rounded-xl border border-brand-200/80 dark:border-brand-500/30"
               >
-                <img
+                <Image
                   src={repoPreviewUrl}
                   alt={`${project.title} repository preview`}
+                  width={1280}
+                  height={640}
+                  sizes="(max-width: 768px) 100vw, 768px"
                   loading="lazy"
                   className="h-auto w-full"
                 />

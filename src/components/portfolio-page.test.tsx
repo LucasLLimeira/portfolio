@@ -1,10 +1,11 @@
+import * as React from "react";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PortfolioPage } from "./portfolio-page";
 
 vi.mock("next/image", () => ({
-  default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => <img {...props} alt={props.alt ?? ""} />,
+  default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => React.createElement("img", { ...props, alt: props.alt ?? "" }),
 }));
 
 vi.mock("@/contexts/locale-context", () => ({

@@ -26,7 +26,7 @@ function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function getGithubHeaders(): HeadersInit {
+function getGithubApiHeaders(): HeadersInit {
   const token = process.env.GITHUB_TOKEN || process.env.NEXT_PUBLIC_GITHUB_TOKEN;
 
   if (token) {
@@ -42,6 +42,13 @@ function getGithubHeaders(): HeadersInit {
     "User-Agent": "portfolio-app",
     Accept: "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28",
+  };
+}
+
+function getGithubWebHeaders(): HeadersInit {
+  return {
+    "User-Agent": "portfolio-app",
+    Accept: "text/html,application/xhtml+xml",
   };
 }
 
@@ -80,6 +87,15 @@ function parseRepoNamesFromSection(html: string): string[] {
 }
 
 function extractPinnedNames(profileHtml: string): string[] {
+  const pinnedContainerMarker = "js-pinned-items-reorder-container";
+  const pinnedContainerStart = profileHtml.indexOf(pinnedContainerMarker);
+
+  if (pinnedContainerStart !== -1) {
+    const containerChunk = profileHtml.slice(pinnedContainerStart, pinnedContainerStart + 25000);
+    const names = parseRepoNamesFromSection(containerChunk).slice(0, 3);
+    if (names.length > 0) return names;
+  }
+
   const pinnedStart = profileHtml.indexOf("Pinned");
   const pinnedEnd = profileHtml.indexOf("Contribution activity");
 
@@ -199,16 +215,17 @@ async function fetchHtmlGithubProjects(
   fallbackProjects: Project[],
   locale: Locale,
 ): Promise<Project[]> {
-  const headers = getGithubHeaders();
+  const apiHeaders = getGithubApiHeaders();
+  const webHeaders = getGithubWebHeaders();
 
   const [profileResponse, repositoriesResponse] = await Promise.all([
     fetch(GITHUB_PROFILE, {
       cache: "no-store",
-      headers,
+      headers: webHeaders,
     }),
     fetch(GITHUB_REPOSITORIES_TAB, {
       cache: "no-store",
-      headers,
+      headers: webHeaders,
     }),
   ]);
 
@@ -249,7 +266,7 @@ async function fetchHtmlGithubProjects(
     );
 
       const primaryLanguageFromHtml = repoLanguageMap.get(repoName.toLowerCase());
-      const apiLanguagesBreakdown = await fetchRepoLanguageBreakdownByName(repoName, headers);
+      const apiLanguagesBreakdown = await fetchRepoLanguageBreakdownByName(repoName, apiHeaders);
       const languagesBreakdown =
         apiLanguagesBreakdown.length > 0
           ? apiLanguagesBreakdown
@@ -300,7 +317,7 @@ function extractLanguagesFromRepositoriesHtml(repositoriesHtml: string): string[
 export async function fetchGithubLanguageStats(): Promise<LanguageStat[]> {
   try {
     const response = await fetch(`${GITHUB_API}?sort=pushed&per_page=100`, {
-      headers: getGithubHeaders(),
+      headers: getGithubApiHeaders(),
       cache: "no-store",
     });
 
@@ -363,10 +380,11 @@ export async function fetchFeaturedGithubProjects(
   locale: Locale,
 ): Promise<Project[]> {
   try {
-    const headers = getGithubHeaders();
+    const apiHeaders = getGithubApiHeaders();
+    const webHeaders = getGithubWebHeaders();
 
     const response = await fetch(`${GITHUB_API}?sort=pushed&per_page=100`, {
-      headers,
+      headers: apiHeaders,
       cache: "no-store",
     });
 
@@ -386,7 +404,27 @@ export async function fetchFeaturedGithubProjects(
       nonForkRepos.map((repo) => [repo.name.toLowerCase(), repo] as const),
     );
 
-    const orderedPinned = featuredRepoNames
+    let pinnedNamesFromProfile: string[] = [];
+    try {
+      const profileResponse = await fetch(GITHUB_PROFILE, {
+        cache: "no-store",
+        headers: webHeaders,
+      });
+
+      if (profileResponse.ok) {
+        const profileHtml = await profileResponse.text();
+        pinnedNamesFromProfile = extractPinnedNames(profileHtml);
+      }
+    } catch {
+      pinnedNamesFromProfile = [];
+    }
+
+    const selectedPinnedNames =
+      pinnedNamesFromProfile.length > 0
+        ? pinnedNamesFromProfile
+        : featuredRepoNames;
+
+    const orderedPinned = selectedPinnedNames
       .map((name) => repoMap.get(name.toLowerCase()))
       .filter((repo): repo is GithubRepo => Boolean(repo));
 
@@ -414,7 +452,7 @@ export async function fetchFeaturedGithubProjects(
 
       const languagesBreakdown = await getRepoLanguageBreakdown(
         repo.languages_url,
-        headers,
+        apiHeaders,
       );
 
       const primaryLanguage = languagesBreakdown[0]?.language ?? repo.language ?? undefined;

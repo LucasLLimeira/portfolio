@@ -11,7 +11,7 @@ import {
   useEffect,
 } from "react";
 
-import { detectLocaleFromNavigator, isLocale, LOCALE_COOKIE } from "@/lib/locale";
+import { LOCALE_COOKIE } from "@/lib/locale";
 import type { Locale } from "@/types/content";
 
 type LocaleContextValue = {
@@ -27,11 +27,7 @@ type LocaleProviderProps = {
 };
 
 export function LocaleProvider({ children, initialLocale }: LocaleProviderProps) {
-  const [locale, setLocale] = useState<Locale>(() => {
-    if (typeof window === "undefined") return initialLocale;
-    const stored = localStorage.getItem(LOCALE_COOKIE);
-    return isLocale(stored) ? stored : detectLocaleFromNavigator();
-  });
+  const [locale, setLocale] = useState<Locale>(initialLocale);
 
   useEffect(() => {
     localStorage.setItem(LOCALE_COOKIE, locale);

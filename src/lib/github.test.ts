@@ -43,6 +43,7 @@ describe("fetchFeaturedGithubProjects", () => {
     const fetchMock = vi.mocked(fetch);
     fetchMock
       .mockResolvedValueOnce({ ok: true, json: async () => repoPayload } as Response)
+      .mockResolvedValueOnce({ ok: true, text: async () => "" } as Response)
       .mockResolvedValueOnce({ ok: true, json: async () => ({ TypeScript: 100 }) } as Response)
       .mockResolvedValueOnce({ ok: false, status: 404, headers: new Headers() } as Response);
 
@@ -56,6 +57,7 @@ describe("fetchFeaturedGithubProjects", () => {
     const fetchMock = vi.mocked(fetch);
     fetchMock
       .mockResolvedValueOnce({ ok: true, json: async () => repoPayload } as Response)
+      .mockResolvedValueOnce({ ok: true, text: async () => "" } as Response)
       .mockResolvedValueOnce({ ok: true, json: async () => ({ TypeScript: 100 }) } as Response)
       .mockResolvedValueOnce({ ok: true, status: 200, headers: new Headers() } as Response);
 

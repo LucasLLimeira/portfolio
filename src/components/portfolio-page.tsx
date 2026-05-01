@@ -30,7 +30,7 @@ function getProjectFilterTerms(project: Project) {
 
   if (project.language) terms.add(project.language.toLowerCase());
 
-  ["github", "python", "pythin", "jupyter", "jupyter notebook"].forEach((blocked) => {
+  ["github", "pythin"].forEach((blocked) => {
     terms.delete(blocked);
   });
 
@@ -60,6 +60,7 @@ type ProjectsCarouselProps = {
   languagesLabel: string;
   prevAriaLabel: string;
   nextAriaLabel: string;
+  showArrows?: boolean;
   onOpen: (project: Project) => void;
 };
 
@@ -70,6 +71,7 @@ function ProjectsCarousel({
   languagesLabel,
   prevAriaLabel,
   nextAriaLabel,
+  showArrows = true,
   onOpen,
 }: ProjectsCarouselProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -91,26 +93,28 @@ function ProjectsCarousel({
         {title}
       </p>
 
-      <div className="relative pt-12 md:pt-0">
-        <div className="pointer-events-none absolute right-1 top-0 z-20 flex items-center gap-2 md:left-0 md:right-0 md:top-1/2 md:-translate-y-1/2 md:justify-between">
-          <button
-            type="button"
-            onClick={() => slide("prev")}
-            className="pointer-events-auto inline-flex h-9 w-9 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 md:h-10 md:w-10 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
-            aria-label={prevAriaLabel}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
+      <div className={showArrows ? "relative pt-12 md:pt-0" : "relative"}>
+        {showArrows ? (
+          <div className="pointer-events-none absolute right-1 top-0 z-20 flex items-center gap-2 md:left-0 md:right-0 md:top-1/2 md:-translate-y-1/2 md:justify-between">
+            <button
+              type="button"
+              onClick={() => slide("prev")}
+              className="pointer-events-auto inline-flex h-9 w-9 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 md:h-10 md:w-10 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
+              aria-label={prevAriaLabel}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
 
-          <button
-            type="button"
-            onClick={() => slide("next")}
-            className="pointer-events-auto inline-flex h-9 w-9 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 md:h-10 md:w-10 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
-            aria-label={nextAriaLabel}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => slide("next")}
+              className="pointer-events-auto inline-flex h-9 w-9 items-center justify-center rounded-full border border-brand-300 bg-white/90 text-slate-900 shadow-md transition hover:bg-brand-100 md:h-10 md:w-10 dark:border-brand-500/40 dark:bg-slate-900/85 dark:text-slate-100 dark:hover:bg-slate-800"
+              aria-label={nextAriaLabel}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        ) : null}
 
         <div ref={trackRef} className="carousel-track">
           {projects.map((project) => (
@@ -185,22 +189,15 @@ export function PortfolioPage() {
     };
   }, [content, locale]);
 
-  const tags = useMemo(() => {
-    const uniqueTags = new Set<string>();
-    projects.forEach((project) => {
-      getProjectFilterTerms(project).forEach((term) => uniqueTags.add(term));
-    });
+  const FILTER_TAGS = ["all", "python", "typescript", "css", "html", "javascript", "jupyter notebook"];
 
-    return ["all", ...Array.from(uniqueTags)];
-  }, [projects]);
+  const pinnedProjects = projects.filter((project) => project.isPinned).slice(0, 3);
 
-  const visibleProjects =
-    activeTag === "all"
-      ? projects
-      : projects.filter((project) => getProjectFilterTerms(project).includes(activeTag));
-
-  const pinnedProjects = visibleProjects.filter((project) => project.isPinned).slice(0, 3);
-  const recentProjects = visibleProjects.filter((project) => !project.isPinned);
+  const recentProjects = useMemo(() => {
+    const nonPinned = projects.filter((project) => !project.isPinned);
+    if (activeTag === "all") return nonPinned;
+    return nonPinned.filter((project) => getProjectFilterTerms(project).includes(activeTag));
+  }, [projects, activeTag]);
 
   const languageDonut = useMemo(() => {
     if (languageStats.length === 0) return "";
@@ -405,17 +402,6 @@ export function PortfolioPage() {
             </article>
           ) : null}
 
-          <div className="flex flex-wrap gap-2">
-            {tags.map((tag) => (
-              <Badge
-                key={tag}
-                label={tag === "all" ? content.profile.projectsUi.all : tag}
-                active={activeTag === tag}
-                onClick={() => setActiveTag(tag)}
-              />
-            ))}
-          </div>
-
           {remoteLoading ? (
             <p className="text-sm text-slate-500 dark:text-slate-400">
               {content.profile.projectsUi.loadingRemote}
@@ -436,9 +422,21 @@ export function PortfolioPage() {
               languagesLabel={content.profile.projectsUi.languagesLabel}
               prevAriaLabel={content.profile.projectsUi.carouselPrevAria}
               nextAriaLabel={content.profile.projectsUi.carouselNextAria}
+              showArrows={false}
               onOpen={setSelectedProject}
             />
           ) : null}
+
+          <div className="flex flex-wrap gap-2">
+            {FILTER_TAGS.map((tag) => (
+              <Badge
+                key={tag}
+                label={tag === "all" ? content.profile.projectsUi.all : tag}
+                active={activeTag === tag}
+                onClick={() => setActiveTag(tag)}
+              />
+            ))}
+          </div>
 
           <ProjectsCarousel
             title={content.profile.projectsUi.recentTitle}

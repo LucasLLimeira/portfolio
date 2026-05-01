@@ -1,39 +1,35 @@
 import type { Project } from "@/types/content";
 
-export const featuredRepoNames = [
-  "ToDo-React-Avancado",
-  "portfolio",
-  "catalogo-livros-ts",
-];
+export const featuredRepoNames = ["Cadastro_usuario", "Ufood", "Diario_de_bordo"];
 
 export const projects: Project[] = [
   {
-    slug: "todo-list",
-    title: "Todo List (React)",
+    slug: "cadastro_usuario",
+    title: "Cadastro_usuario",
     description:
-      "Aplicação de tarefas com foco em produtividade, organização por status e interface intuitiva.",
-    tags: ["react", "typescript", "css"],
-    githubUrl: "https://github.com/LucasLLimeira/todo-list",
+      "Aplicação web de autenticação e cadastro com fluxo de registro, login e área protegida.",
+    tags: ["next.js", "react", "typescript", "zod", "react-hook-form", "api"],
+    githubUrl: "https://github.com/LucasLLimeira/Cadastro_usuario",
     demoUrl: "",
     image: "",
   },
   {
-    slug: "landing-page",
-    title: "Landing Page (a construir)",
+    slug: "ufood",
+    title: "Ufood",
     description:
-      "Landing page de conversão com design responsivo, copy orientada a resultado e boa performance.",
-    tags: ["next.js", "tailwind", "seo"],
-    githubUrl: "https://github.com/LucasLLimeira/landing-page",
+      "Aplicação de pedidos para restaurante com arquitetura de micro frontends e módulos desacoplados.",
+    tags: ["react", "webpack", "module-federation", "tailwind", "micro-frontends"],
+    githubUrl: "https://github.com/LucasLLimeira/Ufood",
     demoUrl: "",
     image: "",
   },
   {
-    slug: "cadastro-de-usuario",
-    title: "Cadastro de Usuário (a construir)",
+    slug: "diario_de_bordo",
+    title: "Diario_de_bordo",
     description:
-      "Fluxo de cadastro com validações, feedback visual e base para integrações com APIs.",
-    tags: ["next.js", "api", "forms"],
-    githubUrl: "https://github.com/LucasLLimeira/cadastro-de-usuario",
+      "PWA para registro de atividades diárias com suporte offline, persistência local e instalação no dispositivo.",
+    tags: ["javascript", "pwa", "service-worker", "web-app-manifest", "localstorage"],
+    githubUrl: "https://github.com/LucasLLimeira/Diario_de_bordo",
     demoUrl: "",
     image: "",
   },

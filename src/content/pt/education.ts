@@ -16,7 +16,7 @@ export const education: EducationItem[] = [
     title: "Certificado EBAC Front-end",
     description: "Formação prática em desenvolvimento front-end com componentes reutilizáveis, responsividade e boas práticas.",
     institution: "EBAC",
-    status: "Em andamento",
+    status: "Concluído",
     certificateUrl: "/certificates/certificado-ebac-frontend.pdf",
   },
   {

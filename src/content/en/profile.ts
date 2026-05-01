@@ -13,7 +13,7 @@ export const profile: ProfileContent = {
     whatsappMessage: "Hello, I would like to talk about a project/proposal",
   },
   assets: {
-    cvHref: "/cv-lucas-limeira.pdf",
+    cvHref: "/cv-Lucas-Limeira.pdf",
     avatarAlt: "Lucas Limeira",
   },
   metadata: {
@@ -55,13 +55,15 @@ export const profile: ProfileContent = {
     kicker: "About me",
     title: "My journey",
     description:
-      "I am a Full Stack Developer with a background in Civil Engineering, which gave me a solid foundation in logical reasoning, problem analysis, and process organization. I began my tech career developing practical projects to establish front-end fundamentals, evolving into building complete full stack applications.\n\nCurrently, I develop solutions using React on the frontend and Node.js, with a focus on API integration, best practices, and performance. I strive to create efficient, well-structured applications while maintaining continuous learning and growth as part of my process.",
+      "I am a Full Stack Developer with a background in Civil Engineering, which gave me a solid foundation in logical reasoning, problem analysis, and process organization. I began my tech career developing practical projects to establish front-end fundamentals, evolving into building complete full stack applications.\n\nCurrently, I develop solutions with React on the frontend and backend using Node.js and Python, building REST APIs, database integrations, and server-side business logic. I have been deepening my use of Python to structure services with a focus on organization, performance, and best practices. I strive to create efficient, well-structured applications while maintaining continuous learning and growth as part of my process.",
     highlights: [
       "Next.js",
       "React",
       "TypeScript",
       "Node.js",
       "REST APIs",
+      "Python",
+      "Databases",
     ],
   },
   projectsUi: {

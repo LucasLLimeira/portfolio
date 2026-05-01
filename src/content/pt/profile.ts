@@ -13,7 +13,7 @@ export const profile: ProfileContent = {
     whatsappMessage: "Olá Quero entrar em contato para um projeto/proposta",
   },
   assets: {
-    cvHref: "/cv-lucas-limeira.pdf",
+    cvHref: "/cv-Lucas-Limeira.pdf",
     avatarAlt: "Lucas Limeira",
   },
   metadata: {
@@ -55,13 +55,15 @@ export const profile: ProfileContent = {
     kicker: "Sobre mim",
     title: "Minha trajetoria",
     description:
-      "Sou Desenvolvedor Full Stack com formação em Engenharia Civil, o que me proporcionou uma base sólida em raciocínio lógico, análise de problemas e organização de processos. Iniciei minha trajetória na tecnologia desenvolvendo projetos práticos para consolidar fundamentos em front-end, evoluindo para a construção de aplicações full stack completas.\n\nAtualmente, desenvolvo soluções utilizando React no frontend e Node.js, com foco em integração de APIs, boas práticas e performance. Busco criar aplicações eficientes e bem estruturadas, mantendo sempre a evolução contínua e o aprendizado como parte do processo.",
+      "Sou Desenvolvedor Full Stack com formação em Engenharia Civil, o que me proporcionou uma base sólida em raciocínio lógico, análise de problemas e organização de processos. Iniciei minha trajetória na tecnologia desenvolvendo projetos práticos para consolidar fundamentos em front-end, evoluindo para a construção de aplicações full stack completas.\n\nAtualmente, desenvolvo soluções com React no frontend e backend em Node.js e Python, criando APIs REST, integrações com banco de dados e regras de negócio no servidor. Tenho aprofundado o uso de Python para estruturar serviços com foco em organização, performance e boas práticas. Busco criar aplicações eficientes e bem estruturadas, mantendo sempre a evolução contínua e o aprendizado como parte do processo.",
     highlights: [
       "Next.js",
       "React",
       "TypeScript",
       "Node.js",
       "APIs REST",
+      "Python",
+      "Banco de Dados",
     ],
   },
   projectsUi: {

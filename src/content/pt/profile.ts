@@ -13,7 +13,7 @@ export const profile: ProfileContent = {
     whatsappMessage: "Olá Quero entrar em contato para um projeto/proposta",
   },
   assets: {
-    cvHref: "/cv-Lucas-Limeira.pdf",
+    cvHref: "/cv-lucas-limeira.pdf",
     avatarAlt: "Lucas Limeira",
   },
   metadata: {

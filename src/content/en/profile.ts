@@ -13,7 +13,7 @@ export const profile: ProfileContent = {
     whatsappMessage: "Hello, I would like to talk about a project/proposal",
   },
   assets: {
-    cvHref: "/cv-Lucas-Limeira.pdf",
+    cvHref: "/cv-lucas-limeira.pdf",
     avatarAlt: "Lucas Limeira",
   },
   metadata: {

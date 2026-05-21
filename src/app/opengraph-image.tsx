@@ -20,13 +20,13 @@ const ogContentByLocale: Record<Locale, { badge: string; line1: string; line2: s
     badge: "Desenvolvedor FullStack",
     line1: "Olá, eu sou Lucas,",
     line2: "Desenvolvedor Full Stack.",
-    stack: "React · Node.js · TypeScript · APIs REST",
+    stack: "Python · React · Node.js · TypeScript · APIs REST",
   },
   en: {
     badge: "FullStack Developer",
     line1: "Hi, I'm Lucas,",
     line2: "Full Stack Developer.",
-    stack: "React · Node.js · TypeScript · REST APIs",
+    stack: "Python · React · Node.js · TypeScript · REST APIs",
   },
 };
 
